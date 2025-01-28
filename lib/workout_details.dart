@@ -18,9 +18,7 @@ class WorkoutDetails extends StatelessWidget {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Target: ${result.exercise.target}'),
-                Text('Unit: ${result.exercise.unit}'),
-                Text('Output: ${result.output} ${result.exercise.unit}'),
+                Text('Target: ${result.exercise.target} ${result.exercise.unit}, Output: ${result.output} ${result.exercise.unit}'),
                 SizedBox(height: 8),
                 _buildSuccessIndicator(result),
               ],
