@@ -25,7 +25,7 @@ class WorkoutHistoryPage extends StatelessWidget {
             color: Colors.orangeAccent,
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
-              title: Text("Workout on ${workout.date.toLocal()}"),
+              title: Text("Workout on ${workout.date.month}/${workout.date.day}"),
               subtitle: Text(
                   "${workout.results.length} exercises, $successfulCount successful"),
               trailing: IconButton(
@@ -71,7 +71,7 @@ final List<Workout> workouts = [
     ],
   ),
   Workout(
-    date: DateTime(2025, 1, 15),
+    date: DateTime(2025, 10, 15),
     results: [
       Result(exercise: Exercise(name: "30 Chest reps", target: 30, unit: "reps"), output: 30),
       Result(exercise: Exercise(name: "Running 5 Km", target: 5, unit: "km"), output: 5.2),
