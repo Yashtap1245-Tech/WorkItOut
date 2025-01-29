@@ -9,7 +9,9 @@ class WorkoutDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return Scaffold(
+      appBar: AppBar(),
+      body: ListView(
       children: workout.results.map((result) {
         return Card(
           margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -26,6 +28,7 @@ class WorkoutDetails extends StatelessWidget {
           ),
         );
       }).toList(),
+    ),
     );
   }
 
