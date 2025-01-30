@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:workout_tracker/distance_input.dart';
 import 'package:workout_tracker/repetitions_input.dart';
 import 'package:workout_tracker/weight_input.dart';
+import 'package:workout_tracker/workout_provider.dart';
 import 'model/exercise.dart';
+import 'model/result.dart';
+import 'model/workout.dart';
 import 'model/workout_plan.dart';
 
 class WorkoutRecordingPage extends StatefulWidget {
@@ -76,7 +80,23 @@ class _State extends State<WorkoutRecordingPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            List<Result> results = [];
+            for (var exercise in workoutPlan.exercises) {
+              final input = _controllers[exercise.name]?.text;
+              if (input != null && input.isNotEmpty) {
+                results.add(Result(
+                  exercise: exercise,
+                  output: double.tryParse(input) ?? 0.0,
+                ));
+              }
+            }
+            final newWorkout = Workout(date: DateTime.now(), results: results);
+            context.read<WorkoutProvider>().addWorkout(newWorkout);
+            Navigator.of(context).pop();
+          }
+        },
         child: Icon(Icons.save),
         tooltip: 'Save Workout',
       ),
