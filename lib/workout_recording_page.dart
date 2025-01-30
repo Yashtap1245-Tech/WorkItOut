@@ -15,7 +15,6 @@ class _State extends State<WorkoutRecordingPage> {
   Widget build(BuildContext context) {
     return const Placeholder();
   }
-
 }
 
 final workoutPlan = WorkoutPlan(
@@ -25,6 +24,11 @@ final workoutPlan = WorkoutPlan(
         name: "Decline Press",
         target: 100,
         unit: "kg",
+      ),
+      Exercise(
+        name: "Running",
+        target: 2,
+        unit: "km",
       ),
       Exercise(
         name: "Flat Press",

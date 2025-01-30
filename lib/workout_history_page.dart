@@ -3,6 +3,7 @@ import 'package:workout_tracker/model/exercise.dart';
 import 'package:workout_tracker/model/result.dart';
 import 'package:workout_tracker/model/workout.dart';
 import 'package:workout_tracker/workout_details.dart';
+import 'package:workout_tracker/workout_recording_page.dart';
 
 class WorkoutHistoryPage extends StatelessWidget {
   const WorkoutHistoryPage({super.key});
@@ -36,13 +37,21 @@ class WorkoutHistoryPage extends StatelessWidget {
                         builder: (context) => WorkoutDetails(workout: workout)
                     ),
                   );
-
                 },
               ),
             ),
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(onPressed: ()
+      {
+        Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (context) => WorkoutRecordingPage()
+        ),
+      );
+      },
+      child: const Icon(Icons.add),),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -60,7 +69,6 @@ class WorkoutHistoryPage extends StatelessWidget {
     );
   }
 }
-
 
 final List<Workout> workouts = [
   Workout(
