@@ -15,6 +15,7 @@ class WorkoutDetails extends StatelessWidget {
       children: workout.results.map((result) {
         return Card(
           margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          color: Colors.white10,
           child: ListTile(
             title: Text(result.exercise.name),
             subtitle: Column(

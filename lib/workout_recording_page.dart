@@ -13,7 +13,6 @@ class WorkoutRecordingPage extends StatefulWidget {
 }
 
 class _State extends State<WorkoutRecordingPage> {
-
   final _formKey = GlobalKey<FormState>();
   late Map<String, TextEditingController> _controllers;
 
@@ -53,15 +52,8 @@ class _State extends State<WorkoutRecordingPage> {
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        spreadRadius: 2,
-                      ),
-                    ],
+                    color: Colors.black12,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

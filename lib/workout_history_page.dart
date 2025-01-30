@@ -23,7 +23,7 @@ class WorkoutHistoryPage extends StatelessWidget {
               .length;
           return Card(
             margin: const EdgeInsets.all(8),
-            color: Colors.orangeAccent,
+            color: Colors.black12,
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
               title: Text("Workout on ${workout.date.month}/${workout.date.day}"),
@@ -51,7 +51,9 @@ class WorkoutHistoryPage extends StatelessWidget {
         ),
       );
       },
-      child: const Icon(Icons.add),),
+      child: const Icon(Icons.add),
+        backgroundColor: Colors.black12,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -64,7 +66,7 @@ class WorkoutHistoryPage extends StatelessWidget {
           ),
         ],
         currentIndex: 0,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: Colors.black,
       ),
     );
   }
