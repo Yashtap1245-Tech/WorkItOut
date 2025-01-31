@@ -5,7 +5,7 @@ class DistanceInput extends StatelessWidget {
 
   final TextEditingController controller;
 
-  DistanceInput({Key ? key}) : controller = TextEditingController(), super(key : key);
+  const DistanceInput({required this.controller});
 
   @override
   Widget build(BuildContext context) {

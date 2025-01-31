@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 class RepetitionsInput extends StatelessWidget {
   final TextEditingController controller;
 
-  RepetitionsInput({Key? key}) : controller = TextEditingController(), super(key: key);
+  const RepetitionsInput({required this.controller});
 
   @override
   Widget build(BuildContext context) {

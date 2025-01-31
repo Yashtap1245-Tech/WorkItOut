@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 class WeightInput extends StatelessWidget {
   final TextEditingController controller;
 
-  WeightInput({Key? key}) : controller = TextEditingController(), super(key: key);
+  const WeightInput({required this.controller});
 
   @override
   Widget build(BuildContext context) {

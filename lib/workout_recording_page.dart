@@ -46,11 +46,11 @@ class _State extends State<WorkoutRecordingPage> {
                 Widget inputType = Container();
 
                 if(exercise.unit == "reps")
-                  inputType = RepetitionsInput();
+                  inputType = RepetitionsInput(controller: _controllers[exercise.name]!);
                 else if(exercise.unit == "kg")
-                  inputType = WeightInput();
+                  inputType = WeightInput(controller: _controllers[exercise.name]!);
                 else if(exercise.unit == "km")
-                  inputType = DistanceInput();
+                  inputType = DistanceInput(controller: _controllers[exercise.name]!);
 
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 10),
@@ -69,6 +69,12 @@ class _State extends State<WorkoutRecordingPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      Text(
+                          ("Target ${exercise.target} ${exercise.unit}"),
+                        style: TextStyle(
+                          fontSize: 12,
+                        )
+                      ),
                       SizedBox(height: 8),
                       inputType,
                     ],
@@ -86,7 +92,8 @@ class _State extends State<WorkoutRecordingPage> {
             for (var exercise in workoutPlan.exercises) {
               final input = _controllers[exercise.name]?.text;
               if (input != null && input.isNotEmpty) {
-                results.add(Result(
+                results.add(
+                    Result(
                   exercise: exercise,
                   output: double.tryParse(input) ?? 0.0,
                 ));
