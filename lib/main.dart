@@ -15,9 +15,9 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => WorkoutProvider(),
       child: MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Workout App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black12),
         useMaterial3: true,
       ),
       home: const WorkoutHistoryPage(),

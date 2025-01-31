@@ -104,8 +104,11 @@ class _State extends State<WorkoutRecordingPage> {
             Navigator.of(context).pop();
           }
         },
-        child: Icon(Icons.save),
-        tooltip: 'Save Workout',
+        child: Icon(
+            Icons.save,
+            color: Colors.white,),
+        tooltip: 'Record Workout',
+        backgroundColor: Colors.black,
       ),
     );
   }
