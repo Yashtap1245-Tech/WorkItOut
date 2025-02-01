@@ -37,5 +37,40 @@ main() {
     }
   });
 
+  testWidgets('Fill out all fields and click save adds it in the provider', (WidgetTester tester) async {
+    final workoutProvider = WorkoutProvider();
 
+    await tester.pumpWidget(
+      ChangeNotifierProvider<WorkoutProvider>(
+        create: (_) => workoutProvider,
+        child: MaterialApp(
+          home: WorkoutRecordingPage(),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextFormField).at(0), '100');
+    await tester.enterText(find.byType(TextFormField).at(1), '2');
+    await tester.enterText(find.byType(TextFormField).at(2), '150');
+    await tester.enterText(find.byType(TextFormField).at(3), '120');
+    await tester.tap(find.byIcon(Icons.add).at(0));
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.add).at(1));
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.add).at(2));
+    await tester.pump();
+
+    await tester.tap(find.byIcon(Icons.add).at(3));
+    await tester.pump();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+
+    final newWorkout = workoutProvider.workouts.first;
+
+    expect(newWorkout.results.length, 8);
+
+    expect(newWorkout.results[0].exercise.name, 'Decline Press');
+    expect(newWorkout.results[0].output, 100.0); // Should be 100 kg
+  });
 }
