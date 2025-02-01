@@ -16,26 +16,43 @@ class WorkoutRecordingPage extends StatefulWidget {
   @override
   State<WorkoutRecordingPage> createState() => _State();
 }
-
 class _State extends State<WorkoutRecordingPage> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, TextEditingController> _controllers;
+  late Map<String, int> _repsCounters; // To store counters for exercises with "reps"
 
-  @override
   @override
   void initState() {
     super.initState();
     _controllers = {};
+    _repsCounters = {}; // Initialize counter map
 
     for (var exercise in workoutPlan.exercises) {
       _controllers[exercise.name] = TextEditingController();
+      if (exercise.unit == "reps") {
+        _repsCounters[exercise.name] = 0; // Initialize counter for reps exercises
+      }
     }
+  }
+
+  void _incrementCounter(String exerciseName) {
+    setState(() {
+      _repsCounters[exerciseName] = (_repsCounters[exerciseName] ?? 0) + 1;
+    });
+  }
+
+  void _decrementCounter(String exerciseName) {
+    setState(() {
+      if (_repsCounters[exerciseName]! > 0) {
+        _repsCounters[exerciseName] = (_repsCounters[exerciseName] ?? 0) - 1;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Record Workout')),
+      appBar: AppBar(title: Text('Record Workout'), backgroundColor: Colors.black12,),
       body: Stack(children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -47,15 +64,17 @@ class _State extends State<WorkoutRecordingPage> {
                 children: workoutPlan.exercises.map((exercise) {
                   Widget inputType = Container();
 
-                  if (exercise.unit == "reps")
+                  if (exercise.unit == "reps") {
                     inputType = RepetitionsInput(
-                        controller: _controllers[exercise.name]!);
-                  else if (exercise.unit == "kg")
-                    inputType =
-                        WeightInput(controller: _controllers[exercise.name]!);
-                  else if (exercise.unit == "km")
-                    inputType =
-                        DistanceInput(controller: _controllers[exercise.name]!);
+                      counter: _repsCounters[exercise.name] ?? 0,
+                      onIncrement: () => _incrementCounter(exercise.name),
+                      onDecrement: () => _decrementCounter(exercise.name),
+                    );
+                  } else if (exercise.unit == "kg") {
+                    inputType = WeightInput(controller: _controllers[exercise.name]!);
+                  } else if (exercise.unit == "km") {
+                    inputType = DistanceInput(controller: _controllers[exercise.name]!);
+                  }
 
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 10),
@@ -102,6 +121,14 @@ class _State extends State<WorkoutRecordingPage> {
                   output: double.tryParse(input) ?? 0.0,
                 ));
               }
+              if (exercise.unit == 'reps') {
+                // Use counter value for 'reps' exercises
+                final reps = _repsCounters[exercise.name] ?? 0;
+                results.add(Result(
+                  exercise: exercise,
+                  output: reps.toDouble(),
+                ));
+              }
             }
             final newWorkout = Workout(date: DateTime.now(), results: results);
             context.read<WorkoutProvider>().addWorkout(newWorkout);
@@ -118,6 +145,7 @@ class _State extends State<WorkoutRecordingPage> {
     );
   }
 }
+
 
 final workoutPlan = WorkoutPlan(
   name: "Chest Workout",
@@ -144,7 +172,7 @@ final workoutPlan = WorkoutPlan(
     ),
     Exercise(
       name: "Machine Fly",
-      target: 30,
+      target: 6,
       unit: "reps",
     ),
     Exercise(
@@ -154,12 +182,12 @@ final workoutPlan = WorkoutPlan(
     ),
     Exercise(
       name: "Dumble Scoop",
-      target: 50,
+      target: 5,
       unit: "reps",
     ),
     Exercise(
       name: "Push-ups",
-      target: 50,
+      target: 5,
       unit: "reps",
     ),
   ],

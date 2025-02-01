@@ -25,7 +25,7 @@ class WorkoutDetails extends StatelessWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text("Workout Details")),
+      appBar: AppBar(title: Text("Workout Details"), backgroundColor: Colors.black12,),
       body: Stack(
         children: [ListView(
         children: currentWorkout.results.map((result) {

@@ -1,29 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 class RepetitionsInput extends StatelessWidget {
-  final TextEditingController controller;
+  final int counter;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
 
-  const RepetitionsInput({required this.controller});
+  const RepetitionsInput({
+    required this.counter,
+    required this.onIncrement,
+    required this.onDecrement,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        labelText: 'Repetitions Completed',
-        hintText: 'Enter Number of repetitions',
-      ),
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly, // Only allow digits
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: TextEditingController(text: '$counter'),
+          readOnly: true,
+          decoration: InputDecoration(
+            labelText: 'Repetitions Completed',
+            hintText: 'Repetitions: $counter',
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+              icon: Icon(Icons.remove),
+              onPressed: onDecrement,
+            ),
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: onIncrement,
+            ),
+          ],
+        ),
       ],
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Enter Number of repetitions';
-        }
-        return null;
-      },
     );
   }
 }
