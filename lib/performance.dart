@@ -24,13 +24,21 @@ class Performance extends StatelessWidget {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  score == 0 ?
+                  Text(
+                    'No Recent Workouts',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ) :
                   Text(
                     'Performance Score: ${score.toStringAsFixed(1)}',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
                     ),
-                  ),
+                  )
                 ],
               );
             },
