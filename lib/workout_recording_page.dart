@@ -19,18 +19,18 @@ class WorkoutRecordingPage extends StatefulWidget {
 class _State extends State<WorkoutRecordingPage> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, TextEditingController> _controllers;
-  late Map<String, int> _repsCounters; // To store counters for exercises with "reps"
+  late Map<String, int> _repsCounters;
 
   @override
   void initState() {
     super.initState();
     _controllers = {};
-    _repsCounters = {}; // Initialize counter map
+    _repsCounters = {};
 
     for (var exercise in workoutPlan.exercises) {
       _controllers[exercise.name] = TextEditingController();
       if (exercise.unit == "reps") {
-        _repsCounters[exercise.name] = 0; // Initialize counter for reps exercises
+        _repsCounters[exercise.name] = 0;
       }
     }
   }
