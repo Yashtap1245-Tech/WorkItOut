@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_tracker/model/workout.dart';
 import 'package:workout_tracker/model/result.dart';
+import 'package:workout_tracker/performance.dart';
 import 'package:workout_tracker/workout_provider.dart';
 
 class WorkoutDetails extends StatelessWidget {
@@ -25,7 +26,8 @@ class WorkoutDetails extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text("Workout Details")),
-      body: ListView(
+      body: Stack(
+        children: [ListView(
         children: currentWorkout.results.map((result) {
           return Card(
             margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -45,6 +47,8 @@ class WorkoutDetails extends StatelessWidget {
           );
         }).toList(),
       ),
+          Performance(),
+    ])
     );
   }
 
