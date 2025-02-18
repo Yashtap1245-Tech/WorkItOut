@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_tracker/add_workout_plan_page.dart';
 import 'package:workout_tracker/performance.dart';
-import 'package:workout_tracker/repetitions_input.dart';
+import 'package:workout_tracker/seconds_input.dart'; // Assuming you created the SecondsInput widget
 import 'package:workout_tracker/weight_input.dart';
 import 'package:workout_tracker/workout_provider.dart';
 import 'distance_input.dart';
@@ -20,35 +20,35 @@ class WorkoutRecordingPage extends StatefulWidget {
 class _State extends State<WorkoutRecordingPage> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, TextEditingController> _controllers;
-  late Map<String, int> _repsCounters;
+  late Map<String, int> _secondsCounters;
   WorkoutPlan? selectedWorkoutPlan;
 
   @override
   void initState() {
     super.initState();
-    selectedWorkoutPlan = context.read<WorkoutProvider>().workoutPlans[0]; // Default to the first workout plan
+    selectedWorkoutPlan = context.read<WorkoutProvider>().workoutPlans[0];
 
     _controllers = {};
-    _repsCounters = {};
+    _secondsCounters = {};
 
     for (var exercise in selectedWorkoutPlan!.exercises) {
       _controllers[exercise.name] = TextEditingController();
-      if (exercise.unit == "reps") {
-        _repsCounters[exercise.name] = 0;
+      if (exercise.unit == "seconds") {
+        _secondsCounters[exercise.name] = 0;
       }
     }
   }
 
   void _incrementCounter(String exerciseName) {
     setState(() {
-      _repsCounters[exerciseName] = (_repsCounters[exerciseName] ?? 0) + 1;
+      _secondsCounters[exerciseName] = (_secondsCounters[exerciseName] ?? 0) + 1;
     });
   }
 
   void _decrementCounter(String exerciseName) {
     setState(() {
-      if (_repsCounters[exerciseName]! > 0) {
-        _repsCounters[exerciseName] = (_repsCounters[exerciseName] ?? 0) - 1;
+      if (_secondsCounters[exerciseName]! > 0) {
+        _secondsCounters[exerciseName] = (_secondsCounters[exerciseName] ?? 0) - 1;
       }
     });
   }
@@ -75,11 +75,11 @@ class _State extends State<WorkoutRecordingPage> {
                     setState(() {
                       selectedWorkoutPlan = newPlan;
                       _controllers.clear();
-                      _repsCounters.clear();
+                      _secondsCounters.clear();
                       for (var exercise in selectedWorkoutPlan!.exercises) {
                         _controllers[exercise.name] = TextEditingController();
-                        if (exercise.unit == "reps") {
-                          _repsCounters[exercise.name] = 0;
+                        if (exercise.unit == "seconds") {
+                          _secondsCounters[exercise.name] = 0;
                         }
                       }
                     });
@@ -94,15 +94,16 @@ class _State extends State<WorkoutRecordingPage> {
                         children: selectedWorkoutPlan!.exercises.map((exercise) {
                           Widget inputType = Container();
 
-                          if (exercise.unit == "reps") {
-                            inputType = RepetitionsInput(
-                              counter: _repsCounters[exercise.name] ?? 0,
+                          if (exercise.unit == "seconds") {
+                            inputType = SecondsInput(
+                              counter: _secondsCounters[exercise.name] ?? 0,
                               onIncrement: () => _incrementCounter(exercise.name),
                               onDecrement: () => _decrementCounter(exercise.name),
+                              controller: _controllers[exercise.name]!, // Pass controller for text input
                             );
                           } else if (exercise.unit == "kg") {
                             inputType = WeightInput(controller: _controllers[exercise.name]!);
-                          } else if (exercise.unit == "km") {
+                          } else if (exercise.unit == "meters") {
                             inputType = DistanceInput(controller: _controllers[exercise.name]!);
                           }
 
@@ -145,7 +146,6 @@ class _State extends State<WorkoutRecordingPage> {
       ),
       floatingActionButton: Stack(
         children: [
-          // First Floating Action Button (Save Workout)
           Positioned(
             bottom: 16,
             right: 16,
@@ -161,11 +161,11 @@ class _State extends State<WorkoutRecordingPage> {
                         output: double.tryParse(input) ?? 0.0,
                       ));
                     }
-                    if (exercise.unit == 'reps') {
-                      final reps = _repsCounters[exercise.name] ?? 0;
+                    if (exercise.unit == 'seconds') {
+                      final seconds = _secondsCounters[exercise.name] ?? 0;
                       results.add(Result(
                         exercise: exercise,
-                        output: reps.toDouble(),
+                        output: seconds.toDouble(),
                       ));
                     }
                   }
@@ -179,7 +179,6 @@ class _State extends State<WorkoutRecordingPage> {
               backgroundColor: Colors.black,
             ),
           ),
-          // Second Floating Action Button (Download Workout Plan)
           Positioned(
             bottom: 16,
             left: 16,
@@ -189,8 +188,8 @@ class _State extends State<WorkoutRecordingPage> {
                   MaterialPageRoute(builder: (context) => AddWorkoutPlanPage()),
                 );
               },
-              child: Icon(Icons.download),
-              backgroundColor: Colors.black12,
+              child: Icon(Icons.download, color: Colors.white),
+              backgroundColor: Colors.black,
               tooltip: 'Download Workout Plan',
             ),
           ),

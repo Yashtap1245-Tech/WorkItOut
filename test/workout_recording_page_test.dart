@@ -6,7 +6,7 @@ import 'package:workout_tracker/model/exercise.dart';
 import 'package:workout_tracker/model/result.dart';
 import 'package:workout_tracker/model/workout.dart';
 import 'package:workout_tracker/model/workout_plan.dart';
-import 'package:workout_tracker/repetitions_input.dart';
+import 'package:workout_tracker/seconds_input.dart';
 import 'package:workout_tracker/weight_input.dart';
 import 'package:workout_tracker/workout_provider.dart';
 import 'package:workout_tracker/workout_recording_page.dart';
@@ -28,7 +28,7 @@ main() {
       expect(exerciseText, findsOneWidget);
 
       if (exercise.unit == 'reps') {
-        expect(find.byType(RepetitionsInput), findsWidgets);
+        expect(find.byType(SecondsInput), findsWidgets);
       } else if (exercise.unit == 'kg') {
         expect(find.byType(WeightInput), findsWidgets);
       } else if (exercise.unit == 'km') {

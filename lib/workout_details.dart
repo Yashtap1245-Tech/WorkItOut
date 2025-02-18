@@ -12,16 +12,14 @@ class WorkoutDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Watch the provider to get updates on workouts
     final workoutProvider = context.watch<WorkoutProvider>();
 
-    // Find the workout from the provider or fall back to the passed workout
     final currentWorkout = workoutProvider.workouts.firstWhere(
           (w) =>
       w.date.year == workout.date.year &&
           w.date.month == workout.date.month &&
           w.date.day == workout.date.day,
-      orElse: () => workout, // If not found in provider, use the passed workout
+      orElse: () => workout,
     );
 
     return Scaffold(

@@ -16,7 +16,7 @@ class AddWorkoutPlanPage extends StatefulWidget {
 class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
   final _urlController = TextEditingController();
   bool _loading = false;
-  String? _message; // Display success or error message.
+  String? _message;
 
   Future<void> _downloadWorkoutPlan() async {
     final url = _urlController.text.trim();
@@ -24,7 +24,7 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
 
     setState(() {
       _loading = true;
-      _message = null; // Reset message when starting the request.
+      _message = null;
     });
 
     try {
@@ -34,7 +34,6 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
         final Map<String, dynamic> workoutPlanJson = json.decode(response.body);
         final workoutPlan = _parseWorkoutPlan(workoutPlanJson);
 
-        // Save the workout plan to the provider
         context.read<WorkoutProvider>().addWorkoutPlan(workoutPlan);
 
         setState(() {

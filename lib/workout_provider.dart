@@ -37,8 +37,8 @@ final workoutPlan = WorkoutPlan(
     ),
     Exercise(
       name: "Running",
-      target: 2,
-      unit: "km",
+      target: 2000,
+      unit: "meters",
     ),
     Exercise(
       name: "Flat Press",
@@ -52,23 +52,23 @@ final workoutPlan = WorkoutPlan(
     ),
     Exercise(
       name: "Machine Fly",
-      target: 6,
-      unit: "reps",
+      target: 60,
+      unit: "seconds",
     ),
     Exercise(
       name: "Cable Crossover",
-      target: 15,
-      unit: "reps",
+      target: 150,
+      unit: "seconds",
     ),
     Exercise(
       name: "Dumble Scoop",
-      target: 5,
-      unit: "reps",
+      target: 80,
+      unit: "seconds",
     ),
     Exercise(
       name: "Push-ups",
-      target: 5,
-      unit: "reps",
+      target: 150,
+      unit: "seconds",
     ),
   ],
 );
