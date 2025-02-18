@@ -22,24 +22,30 @@ class _State extends State<WorkoutRecordingPage> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, TextEditingController> _controllers;
   late Map<String, int> _secondsCounters;
-  late Map<String, int> _repetitionsCounters;  // Add a new map to handle repetitions
+  late Map<String, int> _repetitionsCounters;
   WorkoutPlan? selectedWorkoutPlan;
 
   @override
   void initState() {
     super.initState();
-    selectedWorkoutPlan = context.read<WorkoutProvider>().workoutPlans[0];
+    selectedWorkoutPlan =
+        context.read<WorkoutProvider>().workoutPlans.isNotEmpty
+            ? context.read<WorkoutProvider>().workoutPlans[0]
+            : null;
 
     _controllers = {};
     _secondsCounters = {};
-    _repetitionsCounters = {};  // Initialize the repetitions counter
+    _repetitionsCounters = {};
 
-    for (var exercise in selectedWorkoutPlan!.exercises) {
-      _controllers[exercise.name] = TextEditingController();
-      if (exercise.unit == "seconds") {
-        _secondsCounters[exercise.name] = 0;
-      } else if (exercise.unit == "repetitions") {  // Initialize repetitions counter
-        _repetitionsCounters[exercise.name] = 0;
+    if (selectedWorkoutPlan != null) {
+      for (var exercise in selectedWorkoutPlan!.exercises) {
+        _controllers[exercise.name] = TextEditingController();
+
+        if (exercise.unit == "seconds") {
+          _secondsCounters[exercise.name] = 0;
+        } else if (exercise.unit == "repetitions") {
+          _repetitionsCounters[exercise.name] = 0;
+        }
       }
     }
   }
@@ -47,19 +53,25 @@ class _State extends State<WorkoutRecordingPage> {
   void _incrementCounter(String exerciseName) {
     setState(() {
       if (_secondsCounters.containsKey(exerciseName)) {
-        _secondsCounters[exerciseName] = (_secondsCounters[exerciseName] ?? 0) + 1;
+        _secondsCounters[exerciseName] =
+            (_secondsCounters[exerciseName] ?? 0) + 1;
       } else if (_repetitionsCounters.containsKey(exerciseName)) {
-        _repetitionsCounters[exerciseName] = (_repetitionsCounters[exerciseName] ?? 0) + 1;
+        _repetitionsCounters[exerciseName] =
+            (_repetitionsCounters[exerciseName] ?? 0) + 1;
       }
     });
   }
 
   void _decrementCounter(String exerciseName) {
     setState(() {
-      if (_secondsCounters.containsKey(exerciseName) && (_secondsCounters[exerciseName]! > 0)) {
-        _secondsCounters[exerciseName] = (_secondsCounters[exerciseName] ?? 0) - 1;
-      } else if (_repetitionsCounters.containsKey(exerciseName) && (_repetitionsCounters[exerciseName]! > 0)) {
-        _repetitionsCounters[exerciseName] = (_repetitionsCounters[exerciseName] ?? 0) - 1;
+      if (_secondsCounters.containsKey(exerciseName) &&
+          (_secondsCounters[exerciseName]! > 0)) {
+        _secondsCounters[exerciseName] =
+            (_secondsCounters[exerciseName] ?? 0) - 1;
+      } else if (_repetitionsCounters.containsKey(exerciseName) &&
+          (_repetitionsCounters[exerciseName]! > 0)) {
+        _repetitionsCounters[exerciseName] =
+            (_repetitionsCounters[exerciseName] ?? 0) - 1;
       }
     });
   }
@@ -67,7 +79,8 @@ class _State extends State<WorkoutRecordingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Record Workout'), backgroundColor: Colors.black12),
+      appBar: AppBar(
+          title: Text('Record Workout'), backgroundColor: Colors.black12),
       body: Stack(
         children: [
           Padding(
@@ -94,12 +107,16 @@ class _State extends State<WorkoutRecordingPage> {
                           _controllers.clear();
                           _secondsCounters.clear();
                           _repetitionsCounters.clear();
+
                           for (var exercise in selectedWorkoutPlan!.exercises) {
-                            _controllers[exercise.name] = TextEditingController();
+                            _controllers[exercise.name] =
+                                TextEditingController();
                             if (exercise.unit == "seconds") {
-                              _secondsCounters[exercise.name] = 0;
+                              _secondsCounters[exercise.name] =
+                                  0; // Initialize seconds counter
                             } else if (exercise.unit == "repetitions") {
-                              _repetitionsCounters[exercise.name] = 0;
+                              _repetitionsCounters[exercise.name] =
+                                  0; // Initialize repetitions counter
                             }
                           }
                         });
@@ -113,56 +130,67 @@ class _State extends State<WorkoutRecordingPage> {
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: selectedWorkoutPlan?.exercises.map((exercise) {
-                          Widget inputType = Container();
+                        children: selectedWorkoutPlan?.exercises
+                                .map((exercise) {
+                              Widget inputType = Container();
 
-                          if (exercise.unit == "seconds") {
-                            inputType = SecondsInput(
-                              counter: _secondsCounters[exercise.name] ?? 0,
-                              onIncrement: () => _incrementCounter(exercise.name),
-                              onDecrement: () => _decrementCounter(exercise.name),
-                              controller: _controllers[exercise.name]!,
-                            );
-                          } else if (exercise.unit == "kg") {
-                            inputType = WeightInput(controller: _controllers[exercise.name]!);
-                          } else if (exercise.unit == "meters") {
-                            inputType = DistanceInput(controller: _controllers[exercise.name]!);
-                          } else if (exercise.unit == "repetitions") {
-                            inputType = RepetitionsInput(
-                              counter: _repetitionsCounters[exercise.name] ?? 0,
-                              onIncrement: () => _incrementCounter(exercise.name),
-                              onDecrement: () => _decrementCounter(exercise.name),
-                              controller: _controllers[exercise.name]!,
-                            );
-                          }
+                              if (exercise.unit == "seconds") {
+                                inputType = SecondsInput(
+                                  counter: _secondsCounters[exercise.name] ?? 0,
+                                  onIncrement: () =>
+                                      _incrementCounter(exercise.name),
+                                  onDecrement: () =>
+                                      _decrementCounter(exercise.name),
+                                  controller: _controllers[exercise.name]!,
+                                );
+                              } else if (exercise.unit == "kg") {
+                                inputType = WeightInput(
+                                    controller: _controllers[exercise.name]!);
+                              } else if (exercise.unit == "meters") {
+                                inputType = DistanceInput(
+                                    controller: _controllers[exercise.name]!);
+                              } else if (exercise.unit == "repetitions") {
+                                inputType = RepetitionsInput(
+                                  counter:
+                                      _repetitionsCounters[exercise.name] ?? 0,
+                                  onIncrement: () =>
+                                      _incrementCounter(exercise.name),
+                                  onDecrement: () =>
+                                      _decrementCounter(exercise.name),
+                                  controller: _controllers[exercise.name]!,
+                                );
+                              }
 
-                          return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.black12,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  exercise.name,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              return Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.black12,
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                Text("Target ${exercise.target} ${exercise.unit}",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                    )),
-                                SizedBox(height: 8),
-                                inputType,
-                              ],
-                            ),
-                          );
-                        }).toList() ?? [],
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      exercise.name,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                        "Target ${exercise.target} ${exercise.unit}",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                        )),
+                                    SizedBox(height: 8),
+                                    inputType,
+                                  ],
+                                ),
+                              );
+                            }).toList() ??
+                            [],
                       ),
                     ),
                   ),
@@ -198,14 +226,16 @@ class _State extends State<WorkoutRecordingPage> {
                       ));
                     }
                     if (exercise.unit == 'repetitions') {
-                      final repetitions = _repetitionsCounters[exercise.name] ?? 0;
+                      final repetitions =
+                          _repetitionsCounters[exercise.name] ?? 0;
                       results.add(Result(
                         exercise: exercise,
                         output: repetitions.toDouble(),
                       ));
                     }
                   }
-                  final newWorkout = Workout(date: DateTime.now(), results: results);
+                  final newWorkout =
+                      Workout(date: DateTime.now(), results: results);
                   context.read<WorkoutProvider>().addWorkout(newWorkout);
                   Navigator.of(context).pop();
                 }
