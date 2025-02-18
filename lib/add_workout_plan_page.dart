@@ -83,7 +83,7 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
               controller: _urlController,
               decoration: InputDecoration(
                 labelText: 'Enter Workout Plan URL',
-                errorText: _message != null ? _message : null, // Show error or success message.
+                errorText: _message != null ? _message : null,
               ),
             ),
             const SizedBox(height: 16),
