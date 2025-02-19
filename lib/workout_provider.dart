@@ -28,18 +28,27 @@ class WorkoutProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadInitialData() async {
+    final db = await _isarService.db;
+    _workouts = await db.workouts.where().findAll();
+    _workoutPlans = await db.workoutPlans.where().findAll();
+    _exercises = await db.exercises.where().findAll();
+    notifyListeners();
+  }
+
   Future<void> addWorkout(Workout workout, List<Result> results) async {
     final db = await _isarService.db;
 
     await db.writeTxn(() async {
-      final workoutId = await db.workouts.put(workout);
+      workout.id = await db.workouts.put(workout); // ✅ Assign ID explicitly
 
       for (var result in results) {
         result.id = await db.results.put(result);
         workout.results.add(result);
       }
 
-      await db.workouts.put(workout); // Save updated workout with linked results
+      await workout.results.save(); // ✅ Ensure the link is saved correctly
+      await db.workouts.put(workout); // ✅ Re-save workout with results linked
     });
 
     _workouts.add(workout);
@@ -67,6 +76,10 @@ class WorkoutProvider extends ChangeNotifier {
 
   Future<Isar> getDatabase() async {
     return await _isarService.db;
+  }
+
+  Future<void> refreshData() async {
+    await loadInitialData(); // Expose a method to refresh when needed
   }
 
 }
