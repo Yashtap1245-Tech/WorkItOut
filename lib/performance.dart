@@ -15,8 +15,9 @@ class Performance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: 60,
-      left: 10,
+      bottom: 20,
+      right: 100,
+      left: 100,
       child: Card(
         color: Colors.black,
         elevation: 5,
@@ -41,13 +42,15 @@ class Performance extends StatelessWidget {
                     children: [
                       score == 0
                           ? Text(
-                        'No Recent Workouts',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      )
+                              'No Recent Workouts',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12),
+                            )
                           : Text(
-                        'Performance Score: ${score.toStringAsFixed(1)}',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
+                              'Performance Score: ${score.toStringAsFixed(1)}',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12),
+                            ),
                     ],
                   );
                 },
@@ -59,7 +62,8 @@ class Performance extends StatelessWidget {
     );
   }
 
-  Future<double> calculatePerformanceScore(WorkoutProvider workoutProvider) async {
+  Future<double> calculatePerformanceScore(
+      WorkoutProvider workoutProvider) async {
     final db = await workoutProvider.getDatabase();
     DateTime now = DateTime.now();
     DateTime oneWeekAgo = now.subtract(Duration(days: 7));
@@ -82,9 +86,8 @@ class Performance extends StatelessWidget {
     }
 
     double workoutFrequencyScore = (recentWorkouts.length / 7) * 50;
-    double performanceScore = totalExercises > 0
-        ? (exercisesMeetingTarget / totalExercises) * 50
-        : 0;
+    double performanceScore =
+        totalExercises > 0 ? (exercisesMeetingTarget / totalExercises) * 50 : 0;
 
     return (workoutFrequencyScore + performanceScore).clamp(0, 100);
   }

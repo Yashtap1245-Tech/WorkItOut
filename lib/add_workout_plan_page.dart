@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:workout_tracker/performance.dart';
 import 'workout_provider.dart';
 import 'model/exercise.dart';
 import 'model/workout_plan.dart';
@@ -82,7 +83,9 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Stack(
+        children: [
+          Scaffold(
       appBar: AppBar(title: const Text('Download Workout Plan')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -117,6 +120,9 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
           ],
         ),
       ),
+    ),
+    Performance(),
+    ],
     );
   }
 }

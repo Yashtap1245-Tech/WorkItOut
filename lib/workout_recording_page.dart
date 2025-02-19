@@ -265,7 +265,7 @@ class _State extends State<WorkoutRecordingPage> {
         ),
         Positioned(
           bottom: 16,
-          left: 16,
+          left: 20,
           child: FloatingActionButton(
             onPressed: () {
               Navigator.of(context).push(
