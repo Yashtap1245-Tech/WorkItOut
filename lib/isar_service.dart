@@ -4,6 +4,7 @@ import '../model/exercise.dart';
 import '../model/workout.dart';
 import '../model/result.dart';
 import '../model/workout_plan.dart';
+import 'package:path_provider/path_provider.dart';
 
 class IsarService {
   late Future<Isar> db;
@@ -13,10 +14,10 @@ class IsarService {
   }
 
   Future<Isar> openDB() async {
-    final dir = Directory.systemTemp.path; // Flutter’s default temporary storage
+    final dir = await getApplicationDocumentsDirectory();
     return Isar.open(
       [ExerciseSchema, WorkoutSchema, ResultSchema, WorkoutPlanSchema],
-      directory: dir, // Persistent storage without path_provider
+      directory: dir.path, // Store in app's document directory
     );
   }
 }
