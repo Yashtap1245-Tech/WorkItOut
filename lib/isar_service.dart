@@ -1,5 +1,4 @@
 import 'package:isar/isar.dart';
-import 'dart:io';
 import '../model/exercise.dart';
 import '../model/workout.dart';
 import '../model/result.dart';
@@ -17,7 +16,7 @@ class IsarService {
     final dir = await getApplicationDocumentsDirectory();
     return Isar.open(
       [ExerciseSchema, WorkoutSchema, ResultSchema, WorkoutPlanSchema],
-      directory: dir.path, // Store in app's document directory
+      directory: dir.path,
     );
   }
 }
