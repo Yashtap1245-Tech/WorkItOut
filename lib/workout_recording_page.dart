@@ -10,7 +10,6 @@ import 'distance_input.dart';
 import 'model/result.dart';
 import 'model/workout.dart';
 import 'model/workout_plan.dart';
-import 'package:isar/isar.dart';
 
 class WorkoutRecordingPage extends StatefulWidget {
   const WorkoutRecordingPage({super.key});
@@ -25,23 +24,43 @@ class _State extends State<WorkoutRecordingPage> {
   late Map<String, int> _secondsCounters;
   late Map<String, int> _repetitionsCounters;
   WorkoutPlan? selectedWorkoutPlan;
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    selectedWorkoutPlan =
-        context.read<WorkoutProvider>().workoutPlans.isNotEmpty
-            ? context.read<WorkoutProvider>().workoutPlans[0]
-            : null;
-
     _controllers = {};
     _secondsCounters = {};
     _repetitionsCounters = {};
+    _loadWorkoutPlans();
+  }
 
+  Future<void> _loadWorkoutPlans() async {
+    final provider = context.read<WorkoutProvider>();
+    await provider.refreshData();
+    if (provider.workoutPlans.isNotEmpty) {
+      selectedWorkoutPlan = provider.workoutPlans.first;
+      await _loadExercises();
+    }
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  Future<void> _loadExercises() async {
     if (selectedWorkoutPlan != null) {
+      final db = await context.read<WorkoutProvider>().getDatabase();
+      await selectedWorkoutPlan!.exercises.load();
+      _initializeControllers();
+      setState(() {});
+    }
+  }
+
+  void _initializeControllers() {
+    _controllers.clear();
+    if (selectedWorkoutPlan != null && selectedWorkoutPlan!.exercises.isNotEmpty) {
       for (var exercise in selectedWorkoutPlan!.exercises) {
         _controllers[exercise.name] = TextEditingController();
-
         if (exercise.unit == "seconds") {
           _secondsCounters[exercise.name] = 0;
         } else if (exercise.unit == "repetitions") {
@@ -120,7 +139,6 @@ class _State extends State<WorkoutRecordingPage> {
         results.add(result);
       }
 
-      // ✅ Update Workout with linked results
       await db.writeTxn(() async {
         await db.workouts.put(newWorkout);
       });
@@ -137,7 +155,9 @@ class _State extends State<WorkoutRecordingPage> {
         title: Text('Record Workout'),
         backgroundColor: Colors.black12,
       ),
-      body: Stack(
+      body: _loading
+          ? Center(child: CircularProgressIndicator())
+          : Stack(
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -145,10 +165,6 @@ class _State extends State<WorkoutRecordingPage> {
               children: [
                 Consumer<WorkoutProvider>(
                   builder: (context, provider, child) {
-                    selectedWorkoutPlan = provider.workoutPlans.isNotEmpty
-                        ? provider.workoutPlans[0]
-                        : null;
-
                     return DropdownButton<WorkoutPlan>(
                       value: selectedWorkoutPlan,
                       items: provider.workoutPlans.map((plan) {
@@ -157,23 +173,14 @@ class _State extends State<WorkoutRecordingPage> {
                           child: Text(plan.name),
                         );
                       }).toList(),
-                      onChanged: (newPlan) {
+                      onChanged: (newPlan) async {
                         setState(() {
                           selectedWorkoutPlan = newPlan;
                           _controllers.clear();
                           _secondsCounters.clear();
                           _repetitionsCounters.clear();
-
-                          for (var exercise in selectedWorkoutPlan!.exercises) {
-                            _controllers[exercise.name] =
-                                TextEditingController();
-                            if (exercise.unit == "seconds") {
-                              _secondsCounters[exercise.name] = 0;
-                            } else if (exercise.unit == "repetitions") {
-                              _repetitionsCounters[exercise.name] = 0;
-                            }
-                          }
                         });
+                        await _loadExercises();
                       },
                     );
                   },
@@ -185,63 +192,62 @@ class _State extends State<WorkoutRecordingPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: selectedWorkoutPlan?.exercises
-                                .map((exercise) {
-                              Widget inputType = Container();
+                            .map((exercise) {
+                          Widget inputType = Container();
 
-                              if (exercise.unit == "seconds") {
-                                inputType = SecondsInput(
-                                  counter: _secondsCounters[exercise.name] ?? 0,
-                                  onIncrement: () =>
-                                      _incrementCounter(exercise.name),
-                                  onDecrement: () =>
-                                      _decrementCounter(exercise.name),
-                                  controller: _controllers[exercise.name]!,
-                                );
-                              } else if (exercise.unit == "kg") {
-                                inputType = WeightInput(
-                                    controller: _controllers[exercise.name]!);
-                              } else if (exercise.unit == "meters") {
-                                inputType = DistanceInput(
-                                    controller: _controllers[exercise.name]!);
-                              } else if (exercise.unit == "repetitions") {
-                                inputType = RepetitionsInput(
-                                  counter:
-                                      _repetitionsCounters[exercise.name] ?? 0,
-                                  onIncrement: () =>
-                                      _incrementCounter(exercise.name),
-                                  onDecrement: () =>
-                                      _decrementCounter(exercise.name),
-                                  controller: _controllers[exercise.name]!,
-                                );
-                              }
+                          if (exercise.unit == "seconds") {
+                            inputType = SecondsInput(
+                              counter: _secondsCounters[exercise.name] ?? 0,
+                              onIncrement: () =>
+                                  _incrementCounter(exercise.name),
+                              onDecrement: () =>
+                                  _decrementCounter(exercise.name),
+                              controller: _controllers[exercise.name]!,
+                            );
+                          } else if (exercise.unit == "kg") {
+                            inputType = WeightInput(
+                                controller: _controllers[exercise.name]!);
+                          } else if (exercise.unit == "meters") {
+                            inputType = DistanceInput(
+                                controller: _controllers[exercise.name]!);
+                          } else if (exercise.unit == "repetitions") {
+                            inputType = RepetitionsInput(
+                              counter:
+                              _repetitionsCounters[exercise.name] ?? 0,
+                              onIncrement: () =>
+                                  _incrementCounter(exercise.name),
+                              onDecrement: () =>
+                                  _decrementCounter(exercise.name),
+                              controller: _controllers[exercise.name]!,
+                            );
+                          }
 
-                              return Container(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.black12,
-                                  borderRadius: BorderRadius.circular(10),
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.black12,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  exercise.name,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      exercise.name,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                        "Target ${exercise.target} ${exercise.unit}",
-                                        style: TextStyle(fontSize: 12)),
-                                    SizedBox(height: 8),
-                                    inputType,
-                                  ],
-                                ),
-                              );
-                            }).toList() ??
+                                Text(
+                                    "Target ${exercise.target} ${exercise.unit}",
+                                    style: TextStyle(fontSize: 12)),
+                                SizedBox(height: 8),
+                                inputType,
+                              ],
+                            ),
+                          );
+                        }).toList() ??
                             [],
                       ),
                     ),

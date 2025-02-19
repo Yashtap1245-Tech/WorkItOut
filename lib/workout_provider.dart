@@ -40,15 +40,15 @@ class WorkoutProvider extends ChangeNotifier {
     final db = await _isarService.db;
 
     await db.writeTxn(() async {
-      workout.id = await db.workouts.put(workout); // ✅ Assign ID explicitly
+      workout.id = await db.workouts.put(workout);
 
       for (var result in results) {
         result.id = await db.results.put(result);
         workout.results.add(result);
       }
 
-      await workout.results.save(); // ✅ Ensure the link is saved correctly
-      await db.workouts.put(workout); // ✅ Re-save workout with results linked
+      await workout.results.save();
+      await db.workouts.put(workout);
     });
 
     _workouts.add(workout);
@@ -79,7 +79,6 @@ class WorkoutProvider extends ChangeNotifier {
   }
 
   Future<void> refreshData() async {
-    await loadInitialData(); // Expose a method to refresh when needed
+    await loadInitialData();
   }
-
 }

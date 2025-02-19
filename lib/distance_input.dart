@@ -14,7 +14,7 @@ class DistanceInput extends StatelessWidget {
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
         labelText: "Distance Walked",
-        hintText: "Enter Distance in km"
+        hintText: "Enter Distance in meters"
       ),
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly, // Only allow digits

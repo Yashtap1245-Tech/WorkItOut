@@ -78,6 +78,11 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
     final workoutPlan = WorkoutPlan(name: json['name']);
     workoutPlan.exercises.addAll(exercises);
 
+    await db.writeTxn(() async {
+      await db.workoutPlans.put(workoutPlan);
+      await workoutPlan.exercises.save();
+    });
+
     return workoutPlan;
   }
 
