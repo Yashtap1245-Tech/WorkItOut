@@ -1,69 +1,72 @@
 import 'package:flutter/material.dart';
-import 'model/exercise.dart';
+import 'package:isar/isar.dart';
+import 'isar_service.dart';
 import 'model/workout.dart';
 import 'model/workout_plan.dart';
+import 'model/exercise.dart';
+import 'model/result.dart';
 
 class WorkoutProvider extends ChangeNotifier {
+  final IsarService _isarService = IsarService();
   List<Workout> _workouts = [];
-  List<WorkoutPlan> _workoutPlans = [workoutPlan];
+  List<WorkoutPlan> _workoutPlans = [];
+  List<Exercise> _exercises = [];
 
   List<Workout> get workouts => _workouts;
-
   List<WorkoutPlan> get workoutPlans => _workoutPlans;
+  List<Exercise> get exercises => _exercises;
 
-  void addWorkout(Workout workout) {
+  WorkoutProvider() {
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final db = await _isarService.db;
+    _workouts = await db.workouts.where().findAll();
+    _workoutPlans = await db.workoutPlans.where().findAll();
+    _exercises = await db.exercises.where().findAll();
+    notifyListeners();
+  }
+
+  Future<void> addWorkout(Workout workout, List<Result> results) async {
+    final db = await _isarService.db;
+
+    await db.writeTxn(() async {
+      final workoutId = await db.workouts.put(workout);
+
+      for (var result in results) {
+        result.id = await db.results.put(result);
+        workout.results.add(result);
+      }
+
+      await db.workouts.put(workout); // Save updated workout with linked results
+    });
+
     _workouts.add(workout);
     notifyListeners();
   }
 
-  void addWorkoutPlan(WorkoutPlan plan) {
+
+  Future<void> addWorkoutPlan(WorkoutPlan plan) async {
+    final db = await _isarService.db;
+    db.writeTxn(() async {
+      await db.workoutPlans.put(plan);
+    });
     _workoutPlans.add(plan);
     notifyListeners();
   }
-}
 
-final workoutPlan = WorkoutPlan(
-  name: "Chest Workout",
-  exercises: [
-    Exercise(
-      name: "Decline Press",
-      target: 100,
-      unit: "kg",
-    ),
-    Exercise(
-      name: "Running",
-      target: 2000,
-      unit: "meters",
-    ),
-    Exercise(
-      name: "Flat Press",
-      target: 150,
-      unit: "kg",
-    ),
-    Exercise(
-      name: "Incline Press",
-      target: 120,
-      unit: "kg",
-    ),
-    Exercise(
-      name: "Machine Fly",
-      target: 50,
-      unit: "repetitions",
-    ),
-    Exercise(
-      name: "Cable Crossover",
-      target: 150,
-      unit: "seconds",
-    ),
-    Exercise(
-      name: "Dumble Scoop",
-      target: 80,
-      unit: "seconds",
-    ),
-    Exercise(
-      name: "Push-ups",
-      target: 50,
-      unit: "repetitions",
-    ),
-  ],
-);
+  Future<void> addExercise(Exercise exercise) async {
+    final db = await _isarService.db;
+    db.writeTxn(() async {
+      await db.exercises.put(exercise);
+    });
+    _exercises.add(exercise);
+    notifyListeners();
+  }
+
+  Future<Isar> getDatabase() async {
+    return await _isarService.db;
+  }
+
+}

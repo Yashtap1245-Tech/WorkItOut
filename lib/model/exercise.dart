@@ -1,13 +1,17 @@
-class Exercise {
-  final String name;
-  final double target;
-  final String unit;
+import 'package:isar/isar.dart';
 
-  const Exercise({
+part 'exercise.g.dart';
+
+@Collection()
+class Exercise {
+  Id id = Isar.autoIncrement; // Auto-incrementing ID
+  late String name;
+  late double target;
+  late String unit;
+
+  Exercise({
     required this.name,
     required this.target,
     required this.unit,
   });
-
-  double get output => this.target;
 }

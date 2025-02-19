@@ -1,11 +1,16 @@
-import 'package:workout_tracker/model/exercise.dart';
+import 'package:isar/isar.dart';
+import 'exercise.dart';
 
+part 'workout_plan.g.dart';
+
+@Collection()
 class WorkoutPlan {
-  final String name;
-  final List<Exercise> exercises;
+  Id id = Isar.autoIncrement;
+  late String name;
 
-  const WorkoutPlan({
+  final exercises = IsarLinks<Exercise>(); // Stores a list of exercises
+
+  WorkoutPlan({
     required this.name,
-    required this.exercises,
   });
 }

@@ -1,11 +1,18 @@
-import 'package:workout_tracker/model/result.dart';
+import 'package:isar/isar.dart';
+import 'result.dart';
 
+part 'workout.g.dart';
+
+@Collection()
 class Workout {
-  final DateTime date;
-  final List<Result> results;
+  Id id = Isar.autoIncrement;
 
-  const Workout({
+  @Index()
+  late DateTime date;
+
+  final results = IsarLinks<Result>(); // Store linked results
+
+  Workout({
     required this.date,
-    required this.results,
   });
 }

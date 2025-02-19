@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'workout_provider.dart';
 import 'model/exercise.dart';
 import 'model/workout_plan.dart';
+import 'package:isar/isar.dart';
 
 class AddWorkoutPlanPage extends StatefulWidget {
   const AddWorkoutPlanPage({super.key});
@@ -32,9 +33,12 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> workoutPlanJson = json.decode(response.body);
-        final workoutPlan = _parseWorkoutPlan(workoutPlanJson);
+        final workoutProvider = Provider.of<WorkoutProvider>(context, listen: false);
+        final db = await workoutProvider.getDatabase();
 
-        context.read<WorkoutProvider>().addWorkoutPlan(workoutPlan);
+        final workoutPlan = await _parseWorkoutPlan(db, workoutPlanJson);
+
+        await workoutProvider.addWorkoutPlan(workoutPlan);
 
         setState(() {
           _message = 'Workout plan saved successfully!';
@@ -55,7 +59,7 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
     }
   }
 
-  WorkoutPlan _parseWorkoutPlan(Map<String, dynamic> json) {
+  Future<WorkoutPlan> _parseWorkoutPlan(Isar db, Map<String, dynamic> json) async {
     final exercises = (json['exercises'] as List).map((exerciseJson) {
       return Exercise(
         name: exerciseJson['name'],
@@ -64,10 +68,16 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
       );
     }).toList();
 
-    return WorkoutPlan(
-      name: json['name'],
-      exercises: exercises,
-    );
+    await db.writeTxn(() async {
+      for (var exercise in exercises) {
+        exercise.id = await db.exercises.put(exercise);
+      }
+    });
+
+    final workoutPlan = WorkoutPlan(name: json['name']);
+    workoutPlan.exercises.addAll(exercises);
+
+    return workoutPlan;
   }
 
   @override

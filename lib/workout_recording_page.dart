@@ -10,6 +10,7 @@ import 'distance_input.dart';
 import 'model/result.dart';
 import 'model/workout.dart';
 import 'model/workout_plan.dart';
+import 'package:isar/isar.dart';
 
 class WorkoutRecordingPage extends StatefulWidget {
   const WorkoutRecordingPage({super.key});
@@ -76,11 +77,66 @@ class _State extends State<WorkoutRecordingPage> {
     });
   }
 
+  Future<void> _saveWorkout() async {
+    if (_formKey.currentState!.validate()) {
+      final workoutProvider = context.read<WorkoutProvider>();
+      final db = await workoutProvider.getDatabase();
+
+      final newWorkout = Workout(date: DateTime.now());
+
+      // ✅ Store Workout first to get an ID
+      await db.writeTxn(() async {
+        newWorkout.id = await db.workouts.put(newWorkout);
+      });
+
+      // ✅ Create and store Results separately
+      final List<Result> results = [];
+
+      for (var exercise in selectedWorkoutPlan!.exercises) {
+        final input = _controllers[exercise.name]?.text;
+        double output = 0.0;
+
+        if (input != null && input.isNotEmpty) {
+          output = double.tryParse(input) ?? 0.0;
+        }
+        if (exercise.unit == 'seconds') {
+          output = _secondsCounters[exercise.name]?.toDouble() ?? 0.0;
+        }
+        if (exercise.unit == 'repetitions') {
+          output = _repetitionsCounters[exercise.name]?.toDouble() ?? 0.0;
+        }
+
+        final result = Result(
+          exerciseId: exercise.id,
+          output: output,
+        );
+
+        // Store the Result in Isar
+        await db.writeTxn(() async {
+          result.id = await db.results.put(result);
+          newWorkout.results.add(result); // Link result to workout
+        });
+
+        results.add(result);
+      }
+
+      // ✅ Update Workout with linked results
+      await db.writeTxn(() async {
+        await db.workouts.put(newWorkout);
+      });
+
+      workoutProvider.addWorkout(newWorkout, results);
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text('Record Workout'), backgroundColor: Colors.black12),
+        title: Text('Record Workout'),
+        backgroundColor: Colors.black12,
+      ),
       body: Stack(
         children: [
           Padding(
@@ -112,11 +168,9 @@ class _State extends State<WorkoutRecordingPage> {
                             _controllers[exercise.name] =
                                 TextEditingController();
                             if (exercise.unit == "seconds") {
-                              _secondsCounters[exercise.name] =
-                                  0; // Initialize seconds counter
+                              _secondsCounters[exercise.name] = 0;
                             } else if (exercise.unit == "repetitions") {
-                              _repetitionsCounters[exercise.name] =
-                                  0; // Initialize repetitions counter
+                              _repetitionsCounters[exercise.name] = 0;
                             }
                           }
                         });
@@ -181,9 +235,7 @@ class _State extends State<WorkoutRecordingPage> {
                                     ),
                                     Text(
                                         "Target ${exercise.target} ${exercise.unit}",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        )),
+                                        style: TextStyle(fontSize: 12)),
                                     SizedBox(height: 8),
                                     inputType,
                                   ],
@@ -201,66 +253,31 @@ class _State extends State<WorkoutRecordingPage> {
           Performance(),
         ],
       ),
-      floatingActionButton: Stack(
-        children: [
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  List<Result> results = [];
-                  for (var exercise in selectedWorkoutPlan!.exercises) {
-                    final input = _controllers[exercise.name]?.text;
-                    if (input != null && input.isNotEmpty) {
-                      results.add(Result(
-                        exercise: exercise,
-                        output: double.tryParse(input) ?? 0.0,
-                      ));
-                    }
-                    if (exercise.unit == 'seconds') {
-                      final seconds = _secondsCounters[exercise.name] ?? 0;
-                      results.add(Result(
-                        exercise: exercise,
-                        output: seconds.toDouble(),
-                      ));
-                    }
-                    if (exercise.unit == 'repetitions') {
-                      final repetitions =
-                          _repetitionsCounters[exercise.name] ?? 0;
-                      results.add(Result(
-                        exercise: exercise,
-                        output: repetitions.toDouble(),
-                      ));
-                    }
-                  }
-                  final newWorkout =
-                      Workout(date: DateTime.now(), results: results);
-                  context.read<WorkoutProvider>().addWorkout(newWorkout);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Icon(Icons.save, color: Colors.white),
-              tooltip: 'Record Workout',
-              backgroundColor: Colors.black,
-            ),
+      floatingActionButton: Stack(children: [
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: FloatingActionButton(
+            onPressed: _saveWorkout,
+            child: Icon(Icons.save, color: Colors.white),
+            backgroundColor: Colors.black,
           ),
-          Positioned(
-            bottom: 16,
-            left: 16,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => AddWorkoutPlanPage()),
-                );
-              },
-              child: Icon(Icons.download, color: Colors.white),
-              backgroundColor: Colors.black,
-              tooltip: 'Download Workout Plan',
-            ),
+        ),
+        Positioned(
+          bottom: 16,
+          left: 16,
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddWorkoutPlanPage()),
+              );
+            },
+            child: Icon(Icons.download, color: Colors.white),
+            backgroundColor: Colors.black,
+            tooltip: 'Download Workout Plan',
           ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 }
