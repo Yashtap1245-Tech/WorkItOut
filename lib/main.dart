@@ -1,16 +1,27 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:workout_tracker/performance.dart';
 import 'workout_provider.dart';
 import 'workout_history_page.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensures async operations before app starts
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   final workoutProvider = WorkoutProvider();
-  await workoutProvider.loadInitialData(); // Fetch all data before UI loads
+  await workoutProvider.loadInitialData();
+
+  await ensureAnonymousSignIn();
 
   runApp(MyApp(workoutProvider: workoutProvider));
+}
+
+Future<void> ensureAnonymousSignIn() async {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  if (auth.currentUser == null) {
+    await auth.signInAnonymously();
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -21,7 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-      value: workoutProvider, // Provide preloaded data
+      value: workoutProvider,
       child: MaterialApp(
         title: 'Workout App',
         theme: ThemeData(
@@ -33,4 +44,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
