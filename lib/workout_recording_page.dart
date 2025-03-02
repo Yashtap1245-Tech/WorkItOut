@@ -103,12 +103,10 @@ class _State extends State<WorkoutRecordingPage> {
 
       final newWorkout = Workout(date: DateTime.now());
 
-      // ✅ Store Workout first to get an ID
       await db.writeTxn(() async {
         newWorkout.id = await db.workouts.put(newWorkout);
       });
 
-      // ✅ Create and store Results separately
       final List<Result> results = [];
 
       for (var exercise in selectedWorkoutPlan!.exercises) {
@@ -118,11 +116,13 @@ class _State extends State<WorkoutRecordingPage> {
         if (input != null && input.isNotEmpty) {
           output = double.tryParse(input) ?? 0.0;
         }
-        if (exercise.unit == 'seconds') {
-          output = _secondsCounters[exercise.name]?.toDouble() ?? 0.0;
-        }
-        if (exercise.unit == 'repetitions') {
+
+        if (exercise.unit == 'repetitions' && (input == null || input.isEmpty)) {
           output = _repetitionsCounters[exercise.name]?.toDouble() ?? 0.0;
+        }
+
+        if (exercise.unit == 'seconds' && (input == null || input.isEmpty)) {
+          output = _secondsCounters[exercise.name]?.toDouble() ?? 0.0;
         }
 
         final result = Result(
@@ -130,10 +130,9 @@ class _State extends State<WorkoutRecordingPage> {
           output: output,
         );
 
-        // Store the Result in Isar
         await db.writeTxn(() async {
           result.id = await db.results.put(result);
-          newWorkout.results.add(result); // Link result to workout
+          newWorkout.results.add(result);
         });
 
         results.add(result);

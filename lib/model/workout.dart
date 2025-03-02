@@ -10,7 +10,7 @@ class Workout {
   @Index()
   late DateTime date;
 
-  final results = IsarLinks<Result>(); // Store linked results
+  final results = IsarLinks<Result>();
 
   Workout({
     required this.date,

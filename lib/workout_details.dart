@@ -6,27 +6,27 @@ import 'package:workout_tracker/model/exercise.dart';
 import 'package:workout_tracker/performance.dart';
 import 'package:workout_tracker/workout_provider.dart';
 import 'package:isar/isar.dart';
-
 class WorkoutDetails extends StatelessWidget {
   final Workout workout;
 
   const WorkoutDetails({super.key, required this.workout});
 
-  Future<Exercise?> _fetchExercise(Isar db, int exerciseId) async {
-    return await db.exercises.get(exerciseId);
+  Future<List<Map<String, dynamic>>> _fetchWorkoutResults(Isar db) async {
+    await workout.results.load();
+    List<Map<String, dynamic>> resultsData = [];
+
+    for (var result in workout.results) {
+      Exercise? exercise = await db.exercises.get(result.exerciseId);
+      if (exercise != null) {
+        resultsData.add({'result': result, 'exercise': exercise});
+      }
+    }
+    return resultsData;
   }
 
   @override
   Widget build(BuildContext context) {
     final workoutProvider = context.watch<WorkoutProvider>();
-
-    final currentWorkout = workoutProvider.workouts.firstWhere(
-          (w) =>
-      w.date.year == workout.date.year &&
-          w.date.month == workout.date.month &&
-          w.date.day == workout.date.day,
-      orElse: () => workout,
-    );
 
     return Scaffold(
       appBar: AppBar(
@@ -34,16 +34,7 @@ class WorkoutDetails extends StatelessWidget {
         backgroundColor: Colors.black12,
       ),
       body: FutureBuilder(
-        future: Future.wait(
-          currentWorkout.results.map((result) async {
-            final db = await workoutProvider.getDatabase(); // Get Isar instance
-            final exercise = await _fetchExercise(db, result.exerciseId);
-            return {
-              'result': result,
-              'exercise': exercise,
-            };
-          }).toList(),
-        ),
+        future: context.read<WorkoutProvider>().getDatabase().then((db) => _fetchWorkoutResults(db)),
         builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -58,11 +49,7 @@ class WorkoutDetails extends StatelessWidget {
               ListView(
                 children: snapshot.data!.map((data) {
                   final result = data['result'] as Result;
-                  final exercise = data['exercise'] as Exercise?;
-
-                  if (exercise == null) {
-                    return ListTile(title: Text("Exercise not found"));
-                  }
+                  final exercise = data['exercise'] as Exercise;
 
                   return Card(
                     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),

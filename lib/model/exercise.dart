@@ -4,7 +4,7 @@ part 'exercise.g.dart';
 
 @Collection()
 class Exercise {
-  Id id = Isar.autoIncrement; // Auto-incrementing ID
+  Id id = Isar.autoIncrement;
   late String name;
   late double target;
   late String unit;
