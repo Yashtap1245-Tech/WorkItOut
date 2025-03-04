@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:workout_tracker/workout_recording_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../group_workout_recording_page.dart';
 
 class JoinTeamWorkoutPage extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class JoinTeamWorkoutPage extends StatefulWidget {
 class _JoinTeamWorkoutPageState extends State<JoinTeamWorkoutPage> {
   final TextEditingController _codeController = TextEditingController();
   String? _errorMessage;
+  bool _loading = false;
 
   Future<void> _joinWorkout() async {
     String inviteCode = _codeController.text.trim();
@@ -20,21 +22,34 @@ class _JoinTeamWorkoutPageState extends State<JoinTeamWorkoutPage> {
       return;
     }
 
-    DocumentSnapshot workoutDoc = await FirebaseFirestore.instance
-        .collection("workouts")
-        .doc(inviteCode)
+    setState(() => _loading = true);
+
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("group_workouts")
+        .where("inviteCode", isEqualTo: inviteCode)
         .get();
 
-    if (!workoutDoc.exists) {
+    if (snapshot.docs.isEmpty) {
       setState(() {
         _errorMessage = "Invalid invite code.";
+        _loading = false;
       });
       return;
     }
 
+    DocumentReference workoutRef = snapshot.docs.first.reference;
+    String workoutId = workoutRef.id;
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    await workoutRef.update({
+      "participants": FieldValue.arrayUnion([userId])
+    });
+
+    setState(() => _loading = false);
+
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => WorkoutRecordingPage(),
+        builder: (context) => GroupWorkoutRecordingPage(workoutId: workoutId),
       ),
     );
   }
@@ -42,7 +57,7 @@ class _JoinTeamWorkoutPageState extends State<JoinTeamWorkoutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Join Team Workout")),
+      appBar: AppBar(title: Text("Join Group Workout")),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -55,7 +70,9 @@ class _JoinTeamWorkoutPageState extends State<JoinTeamWorkoutPage> {
               ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
+            _loading
+                ? CircularProgressIndicator()
+                : ElevatedButton(
               onPressed: _joinWorkout,
               child: Text("Join Workout"),
             ),

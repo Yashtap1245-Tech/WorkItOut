@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/workout_recording_page.dart';
+import 'create_group_workout_page.dart';
 
 class WorkoutTypeSelectionPage extends StatelessWidget {
   const WorkoutTypeSelectionPage({super.key});
@@ -10,8 +11,8 @@ class WorkoutTypeSelectionPage extends StatelessWidget {
         MaterialPageRoute(builder: (context) => WorkoutRecordingPage()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("$type mode is coming soon!")),
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => CreateGroupWorkoutPage()),
       );
     }
   }
@@ -25,8 +26,7 @@ class WorkoutTypeSelectionPage extends StatelessWidget {
         child: Column(
           children: [
             _buildWorkoutTypeCard(context, "Solo", Icons.person),
-            _buildWorkoutTypeCard(context, "Collaborative", Icons.group),
-            _buildWorkoutTypeCard(context, "Competitive", Icons.sports),
+            _buildWorkoutTypeCard(context, "Collective", Icons.group)
           ],
         ),
       ),
