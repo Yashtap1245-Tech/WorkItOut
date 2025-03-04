@@ -58,7 +58,8 @@ class _State extends State<WorkoutRecordingPage> {
 
   void _initializeControllers() {
     _controllers.clear();
-    if (selectedWorkoutPlan != null && selectedWorkoutPlan!.exercises.isNotEmpty) {
+    if (selectedWorkoutPlan != null &&
+        selectedWorkoutPlan!.exercises.isNotEmpty) {
       for (var exercise in selectedWorkoutPlan!.exercises) {
         _controllers[exercise.name] = TextEditingController();
         if (exercise.unit == "seconds") {
@@ -117,7 +118,8 @@ class _State extends State<WorkoutRecordingPage> {
           output = double.tryParse(input) ?? 0.0;
         }
 
-        if (exercise.unit == 'repetitions' && (input == null || input.isEmpty)) {
+        if (exercise.unit == 'repetitions' &&
+            (input == null || input.isEmpty)) {
           output = _repetitionsCounters[exercise.name]?.toDouble() ?? 0.0;
         }
 
@@ -157,107 +159,130 @@ class _State extends State<WorkoutRecordingPage> {
       body: _loading
           ? Center(child: CircularProgressIndicator())
           : Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
               children: [
-                Consumer<WorkoutProvider>(
-                  builder: (context, provider, child) {
-                    return DropdownButton<WorkoutPlan>(
-                      value: selectedWorkoutPlan,
-                      items: provider.workoutPlans.map((plan) {
-                        return DropdownMenuItem(
-                          value: plan,
-                          child: Text(plan.name),
-                        );
-                      }).toList(),
-                      onChanged: (newPlan) async {
-                        setState(() {
-                          selectedWorkoutPlan = newPlan;
-                          _controllers.clear();
-                          _secondsCounters.clear();
-                          _repetitionsCounters.clear();
-                        });
-                        await _loadExercises();
-                      },
-                    );
-                  },
-                ),
-                Expanded(
-                  child: Form(
-                    key: _formKey,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: selectedWorkoutPlan?.exercises
-                            .map((exercise) {
-                          Widget inputType = Container();
-
-                          if (exercise.unit == "seconds") {
-                            inputType = SecondsInput(
-                              counter: _secondsCounters[exercise.name] ?? 0,
-                              onIncrement: () =>
-                                  _incrementCounter(exercise.name),
-                              onDecrement: () =>
-                                  _decrementCounter(exercise.name),
-                              controller: _controllers[exercise.name]!,
-                            );
-                          } else if (exercise.unit == "kg") {
-                            inputType = WeightInput(
-                                controller: _controllers[exercise.name]!);
-                          } else if (exercise.unit == "meters") {
-                            inputType = DistanceInput(
-                                controller: _controllers[exercise.name]!);
-                          } else if (exercise.unit == "repetitions") {
-                            inputType = RepetitionsInput(
-                              counter:
-                              _repetitionsCounters[exercise.name] ?? 0,
-                              onIncrement: () =>
-                                  _incrementCounter(exercise.name),
-                              onDecrement: () =>
-                                  _decrementCounter(exercise.name),
-                              controller: _controllers[exercise.name]!,
-                            );
-                          }
-
-                          return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.black12,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Consumer<WorkoutProvider>(
+                        builder: (context, provider, child) {
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<WorkoutPlan>(
+                                  value: selectedWorkoutPlan,
+                                  isExpanded: true,
+                                  decoration: InputDecoration(
+                                    labelText: "Select Workout Plan",
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 10),
+                                  ),
+                                  items: provider.workoutPlans.map((plan) {
+                                    return DropdownMenuItem(
+                                      value: plan,
+                                      child: Text(plan.name,
+                                          style: TextStyle(fontSize: 16)),
+                                    );
+                                  }).toList(),
+                                  onChanged: (newPlan) async {
+                                    setState(() {
+                                      selectedWorkoutPlan = newPlan;
+                                      _controllers.clear();
+                                      _secondsCounters.clear();
+                                      _repetitionsCounters.clear();
+                                    });
+                                    await _loadExercises();
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      Expanded(
+                        child: Form(
+                          key: _formKey,
+                          child: SingleChildScrollView(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  exercise.name,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                    "Target ${exercise.target} ${exercise.unit}",
-                                    style: TextStyle(fontSize: 12)),
-                                SizedBox(height: 8),
-                                inputType,
-                              ],
+                              children: selectedWorkoutPlan?.exercises
+                                      .map((exercise) {
+                                    Widget inputType = Container();
+
+                                    if (exercise.unit == "seconds") {
+                                      inputType = SecondsInput(
+                                        counter:
+                                            _secondsCounters[exercise.name] ??
+                                                0,
+                                        onIncrement: () =>
+                                            _incrementCounter(exercise.name),
+                                        onDecrement: () =>
+                                            _decrementCounter(exercise.name),
+                                        controller:
+                                            _controllers[exercise.name]!,
+                                      );
+                                    } else if (exercise.unit == "kg") {
+                                      inputType = WeightInput(
+                                          controller:
+                                              _controllers[exercise.name]!);
+                                    } else if (exercise.unit == "meters") {
+                                      inputType = DistanceInput(
+                                          controller:
+                                              _controllers[exercise.name]!);
+                                    } else if (exercise.unit == "repetitions") {
+                                      inputType = RepetitionsInput(
+                                        counter: _repetitionsCounters[
+                                                exercise.name] ??
+                                            0,
+                                        onIncrement: () =>
+                                            _incrementCounter(exercise.name),
+                                        onDecrement: () =>
+                                            _decrementCounter(exercise.name),
+                                        controller:
+                                            _controllers[exercise.name]!,
+                                      );
+                                    }
+
+                                    return Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black12,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            exercise.name,
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                              "Target ${exercise.target} ${exercise.unit}",
+                                              style: TextStyle(fontSize: 12)),
+                                          SizedBox(height: 8),
+                                          inputType,
+                                        ],
+                                      ),
+                                    );
+                                  }).toList() ??
+                                  [],
                             ),
-                          );
-                        }).toList() ??
-                            [],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
+                Performance(),
               ],
             ),
-          ),
-          Performance(),
-        ],
-      ),
       floatingActionButton: Stack(children: [
         Positioned(
           bottom: 16,
