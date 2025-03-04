@@ -74,28 +74,27 @@ class _State extends State<WorkoutRecordingPage> {
   void _incrementCounter(String exerciseName) {
     setState(() {
       if (_secondsCounters.containsKey(exerciseName)) {
-        _secondsCounters[exerciseName] =
-            (_secondsCounters[exerciseName] ?? 0) + 1;
+        _secondsCounters[exerciseName] = (_secondsCounters[exerciseName] ?? 0) + 1;
+        _controllers[exerciseName]?.text = _secondsCounters[exerciseName].toString(); // Update text field
       } else if (_repetitionsCounters.containsKey(exerciseName)) {
-        _repetitionsCounters[exerciseName] =
-            (_repetitionsCounters[exerciseName] ?? 0) + 1;
+        _repetitionsCounters[exerciseName] = (_repetitionsCounters[exerciseName] ?? 0) + 1;
+        _controllers[exerciseName]?.text = _repetitionsCounters[exerciseName].toString(); // Update text field
       }
     });
   }
 
   void _decrementCounter(String exerciseName) {
     setState(() {
-      if (_secondsCounters.containsKey(exerciseName) &&
-          (_secondsCounters[exerciseName]! > 0)) {
-        _secondsCounters[exerciseName] =
-            (_secondsCounters[exerciseName] ?? 0) - 1;
-      } else if (_repetitionsCounters.containsKey(exerciseName) &&
-          (_repetitionsCounters[exerciseName]! > 0)) {
-        _repetitionsCounters[exerciseName] =
-            (_repetitionsCounters[exerciseName] ?? 0) - 1;
+      if (_secondsCounters.containsKey(exerciseName) && (_secondsCounters[exerciseName]! > 0)) {
+        _secondsCounters[exerciseName] = (_secondsCounters[exerciseName] ?? 0) - 1;
+        _controllers[exerciseName]?.text = _secondsCounters[exerciseName].toString(); // Update text field
+      } else if (_repetitionsCounters.containsKey(exerciseName) && (_repetitionsCounters[exerciseName]! > 0)) {
+        _repetitionsCounters[exerciseName] = (_repetitionsCounters[exerciseName] ?? 0) - 1;
+        _controllers[exerciseName]?.text = _repetitionsCounters[exerciseName].toString(); // Update text field
       }
     });
   }
+
 
   Future<void> _saveWorkout() async {
     if (_formKey.currentState!.validate()) {
