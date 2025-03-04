@@ -14,7 +14,9 @@ class GroupWorkoutRecordingPage extends StatefulWidget {
 class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
   final Map<String, TextEditingController> _controllers = {};
   bool _loading = true;
+  bool isHost = false;
   String workoutType = "collaborative"; // Default type
+  String inviteCode = "";
   List<Map<String, dynamic>> exercises = [];
 
   @override
@@ -24,6 +26,8 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
   }
 
   Future<void> _loadWorkoutDetails() async {
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
     // Fetch workout details
     DocumentSnapshot workoutSnapshot = await FirebaseFirestore.instance
         .collection("group_workouts")
@@ -33,6 +37,8 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
     if (workoutSnapshot.exists) {
       var data = workoutSnapshot.data() as Map<String, dynamic>;
       workoutType = data["type"];
+      inviteCode = data["inviteCode"];
+      isHost = data["createdBy"] == userId; // Check if the user is the host
     }
 
     // Fetch exercises for this workout
@@ -97,30 +103,66 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
           : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          children: exercises.map((exercise) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  exercise["name"],
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  controller: _controllers[exercise["id"]],
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: "Enter Output (${exercise["unit"]})",
+          children: [
+            if (isHost) _buildInviteCodeCard(), // Show only if user is the host
+            SizedBox(height: 16),
+            ...exercises.map((exercise) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    exercise["name"],
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                ),
-                SizedBox(height: 16),
-              ],
-            );
-          }).toList(),
+                  TextFormField(
+                    controller: _controllers[exercise["id"]],
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: "Enter Output (${exercise["unit"]})",
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              );
+            }).toList(),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _submitWorkoutResults,
         child: Icon(Icons.save, color: Colors.white),
+      ),
+    );
+  }
+
+  // Invite code card (Visible only to the host)
+  Widget _buildInviteCodeCard() {
+    return Card(
+      color: Colors.black,
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              "Invite Code",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            SizedBox(height: 8),
+            SelectableText(
+              inviteCode,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.greenAccent),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 8),
+            Text(
+              "Share this code with others to join the workout.",
+              style: TextStyle(fontSize: 14, color: Colors.white70),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
