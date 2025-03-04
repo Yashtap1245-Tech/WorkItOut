@@ -13,4 +13,15 @@ class WorkoutPlan {
   WorkoutPlan({
     required this.name,
   });
+
+  Future<void> deleteWorkoutPlan(Isar db, WorkoutPlan plan) async {
+    await db.writeTxn(() async {
+      await plan.exercises.load();
+      for (var exercise in plan.exercises) {
+        await db.exercises.delete(exercise.id);
+      }
+      await db.workoutPlans.delete(plan.id);
+    });
+  }
+
 }

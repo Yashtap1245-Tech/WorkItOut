@@ -65,6 +65,16 @@ class WorkoutProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteWorkoutPlan(WorkoutPlan plan) async {
+    final db = await _isarService.db;
+    await db.writeTxn(() async {
+      await db.workoutPlans.delete(plan.id);
+    });
+
+    _workoutPlans.removeWhere((p) => p.id == plan.id);
+    notifyListeners();
+  }
+
   Future<void> addExercise(Exercise exercise) async {
     final db = await _isarService.db;
     db.writeTxn(() async {

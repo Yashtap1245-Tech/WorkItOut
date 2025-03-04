@@ -168,21 +168,20 @@ class _State extends State<WorkoutRecordingPage> {
                         builder: (context, provider, child) {
                           return Row(
                             children: [
+                              /// Ensures the dropdown takes the required space while not causing an overflow
                               Expanded(
                                 child: DropdownButtonFormField<WorkoutPlan>(
-                                  value: selectedWorkoutPlan,
+                                  value: provider.workoutPlans.contains(selectedWorkoutPlan) ? selectedWorkoutPlan : null, // Ensure selected plan exists
                                   isExpanded: true,
                                   decoration: InputDecoration(
                                     labelText: "Select Workout Plan",
                                     border: OutlineInputBorder(),
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 10),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                   ),
                                   items: provider.workoutPlans.map((plan) {
                                     return DropdownMenuItem(
                                       value: plan,
-                                      child: Text(plan.name,
-                                          style: TextStyle(fontSize: 16)),
+                                      child: Text(plan.name, style: TextStyle(fontSize: 16)),
                                     );
                                   }).toList(),
                                   onChanged: (newPlan) async {
@@ -196,6 +195,48 @@ class _State extends State<WorkoutRecordingPage> {
                                   },
                                 ),
                               ),
+
+                              if (selectedWorkoutPlan != null)
+                                Flexible(
+                                  child: IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () async {
+                                      final confirmed = await showDialog<bool>(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text("Confirm Delete"),
+                                          content: Text(
+                                              "Are you sure you want to delete this workout plan?"),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context, false),
+                                              child: Text("Cancel"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context, true),
+                                              child: Text("Delete",
+                                                  style: TextStyle(
+                                                      color: Colors.red)),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+
+                                      if (confirmed ?? false) {
+                                        await provider.deleteWorkoutPlan(
+                                            selectedWorkoutPlan!);
+                                        setState(() {
+                                          selectedWorkoutPlan =
+                                              provider.workoutPlans.isNotEmpty
+                                                  ? provider.workoutPlans.first
+                                                  : null;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
                             ],
                           );
                         },

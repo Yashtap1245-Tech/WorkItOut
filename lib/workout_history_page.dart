@@ -20,7 +20,6 @@ class WorkoutHistoryPage extends StatelessWidget {
         body: Consumer<WorkoutProvider>(
           builder: (context, workoutProvider, child) {
             final workouts = workoutProvider.workouts;
-
             if (workouts.isEmpty) {
               return Center(child: Text("No workouts found"));
             }
