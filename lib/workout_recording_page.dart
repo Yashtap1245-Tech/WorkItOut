@@ -74,27 +74,36 @@ class _State extends State<WorkoutRecordingPage> {
   void _incrementCounter(String exerciseName) {
     setState(() {
       if (_secondsCounters.containsKey(exerciseName)) {
-        _secondsCounters[exerciseName] = (_secondsCounters[exerciseName] ?? 0) + 1;
-        _controllers[exerciseName]?.text = _secondsCounters[exerciseName].toString(); // Update text field
+        _secondsCounters[exerciseName] =
+            (_secondsCounters[exerciseName] ?? 0) + 1;
+        _controllers[exerciseName]?.text =
+            _secondsCounters[exerciseName].toString(); // Update text field
       } else if (_repetitionsCounters.containsKey(exerciseName)) {
-        _repetitionsCounters[exerciseName] = (_repetitionsCounters[exerciseName] ?? 0) + 1;
-        _controllers[exerciseName]?.text = _repetitionsCounters[exerciseName].toString(); // Update text field
+        _repetitionsCounters[exerciseName] =
+            (_repetitionsCounters[exerciseName] ?? 0) + 1;
+        _controllers[exerciseName]?.text =
+            _repetitionsCounters[exerciseName].toString(); // Update text field
       }
     });
   }
 
   void _decrementCounter(String exerciseName) {
     setState(() {
-      if (_secondsCounters.containsKey(exerciseName) && (_secondsCounters[exerciseName]! > 0)) {
-        _secondsCounters[exerciseName] = (_secondsCounters[exerciseName] ?? 0) - 1;
-        _controllers[exerciseName]?.text = _secondsCounters[exerciseName].toString(); // Update text field
-      } else if (_repetitionsCounters.containsKey(exerciseName) && (_repetitionsCounters[exerciseName]! > 0)) {
-        _repetitionsCounters[exerciseName] = (_repetitionsCounters[exerciseName] ?? 0) - 1;
-        _controllers[exerciseName]?.text = _repetitionsCounters[exerciseName].toString(); // Update text field
+      if (_secondsCounters.containsKey(exerciseName) &&
+          (_secondsCounters[exerciseName]! > 0)) {
+        _secondsCounters[exerciseName] =
+            (_secondsCounters[exerciseName] ?? 0) - 1;
+        _controllers[exerciseName]?.text =
+            _secondsCounters[exerciseName].toString(); // Update text field
+      } else if (_repetitionsCounters.containsKey(exerciseName) &&
+          (_repetitionsCounters[exerciseName]! > 0)) {
+        _repetitionsCounters[exerciseName] =
+            (_repetitionsCounters[exerciseName] ?? 0) - 1;
+        _controllers[exerciseName]?.text =
+            _repetitionsCounters[exerciseName].toString(); // Update text field
       }
     });
   }
-
 
   Future<void> _saveWorkout() async {
     if (_formKey.currentState!.validate()) {
@@ -170,17 +179,22 @@ class _State extends State<WorkoutRecordingPage> {
                               /// Ensures the dropdown takes the required space while not causing an overflow
                               Expanded(
                                 child: DropdownButtonFormField<WorkoutPlan>(
-                                  value: provider.workoutPlans.contains(selectedWorkoutPlan) ? selectedWorkoutPlan : null, // Ensure selected plan exists
+                                  value: provider.workoutPlans
+                                          .contains(selectedWorkoutPlan)
+                                      ? selectedWorkoutPlan
+                                      : null, // Ensure selected plan exists
                                   isExpanded: true,
                                   decoration: InputDecoration(
                                     labelText: "Select Workout Plan",
                                     border: OutlineInputBorder(),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 10),
                                   ),
                                   items: provider.workoutPlans.map((plan) {
                                     return DropdownMenuItem(
                                       value: plan,
-                                      child: Text(plan.name, style: TextStyle(fontSize: 16)),
+                                      child: Text(plan.name,
+                                          style: TextStyle(fontSize: 16)),
                                     );
                                   }).toList(),
                                   onChanged: (newPlan) async {

@@ -34,7 +34,8 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> workoutPlanJson = json.decode(response.body);
-        final workoutProvider = Provider.of<WorkoutProvider>(context, listen: false);
+        final workoutProvider =
+            Provider.of<WorkoutProvider>(context, listen: false);
         final db = await workoutProvider.getDatabase();
 
         final workoutPlan = await _parseWorkoutPlan(db, workoutPlanJson);
@@ -60,7 +61,8 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
     }
   }
 
-  Future<WorkoutPlan> _parseWorkoutPlan(Isar db, Map<String, dynamic> json) async {
+  Future<WorkoutPlan> _parseWorkoutPlan(
+      Isar db, Map<String, dynamic> json) async {
     final exercises = (json['exercises'] as List).map((exerciseJson) {
       return Exercise(
         name: exerciseJson['name'],
@@ -89,45 +91,47 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-        children: [
-          Scaffold(
-      appBar: AppBar(title: const Text('Download Workout Plan')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _urlController,
-              decoration: InputDecoration(
-                labelText: 'Enter Workout Plan URL',
-                errorText: _message != null ? _message : null,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loading ? null : _downloadWorkoutPlan,
-              child: _loading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Download'),
-            ),
-            if (_message != null) ...[
-              const SizedBox(height: 16),
-              Text(
-                _message!,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: _message == 'Workout plan saved successfully!' ? Colors.green : Colors.red,
+      children: [
+        Scaffold(
+          appBar: AppBar(title: const Text('Download Workout Plan')),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _urlController,
+                  decoration: InputDecoration(
+                    labelText: 'Enter Workout Plan URL',
+                    errorText: _message != null ? _message : null,
+                  ),
                 ),
-              ),
-            ],
-          ],
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _loading ? null : _downloadWorkoutPlan,
+                  child: _loading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Download'),
+                ),
+                if (_message != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    _message!,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: _message == 'Workout plan saved successfully!'
+                          ? Colors.green
+                          : Colors.red,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
-      ),
-    ),
-    Performance(),
-    ],
+        Performance(),
+      ],
     );
   }
 }

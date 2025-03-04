@@ -20,7 +20,10 @@ class _JoinTeamWorkoutPageState extends State<JoinTeamWorkoutPage> {
       return;
     }
 
-    DocumentSnapshot workoutDoc = await FirebaseFirestore.instance.collection("workouts").doc(inviteCode).get();
+    DocumentSnapshot workoutDoc = await FirebaseFirestore.instance
+        .collection("workouts")
+        .doc(inviteCode)
+        .get();
 
     if (!workoutDoc.exists) {
       setState(() {

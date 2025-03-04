@@ -23,5 +23,4 @@ class WorkoutPlan {
       await db.workoutPlans.delete(plan.id);
     });
   }
-
 }

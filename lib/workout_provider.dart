@@ -55,7 +55,6 @@ class WorkoutProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> addWorkoutPlan(WorkoutPlan plan) async {
     final db = await _isarService.db;
     db.writeTxn(() async {

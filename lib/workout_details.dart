@@ -6,6 +6,7 @@ import 'package:workout_tracker/model/exercise.dart';
 import 'package:workout_tracker/performance.dart';
 import 'package:workout_tracker/workout_provider.dart';
 import 'package:isar/isar.dart';
+
 class WorkoutDetails extends StatelessWidget {
   final Workout workout;
 
@@ -34,7 +35,10 @@ class WorkoutDetails extends StatelessWidget {
         backgroundColor: Colors.black12,
       ),
       body: FutureBuilder(
-        future: context.read<WorkoutProvider>().getDatabase().then((db) => _fetchWorkoutResults(db)),
+        future: context
+            .read<WorkoutProvider>()
+            .getDatabase()
+            .then((db) => _fetchWorkoutResults(db)),
         builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

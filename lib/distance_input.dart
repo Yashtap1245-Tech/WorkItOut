@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class DistanceInput extends StatelessWidget {
-
   final TextEditingController controller;
 
   const DistanceInput({required this.controller});
@@ -13,19 +12,16 @@ class DistanceInput extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
-        labelText: "Distance Walked",
-        hintText: "Enter Distance in meters"
-      ),
+          labelText: "Distance Walked", hintText: "Enter Distance in meters"),
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly, // Only allow digits
       ],
       validator: (value) {
-        if(value == null || value.isEmpty){
+        if (value == null || value.isEmpty) {
           return "Please Enter Distance in km";
         }
         return null;
       },
     );
   }
-
 }

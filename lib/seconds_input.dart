@@ -24,12 +24,14 @@ class _SecondsInputState extends State<SecondsInput> {
   void initState() {
     super.initState();
     _controller = widget.controller;
-    _controller.text = widget.counter.toString(); // Initialize the text field with the counter
+    _controller.text =
+        widget.counter.toString(); // Initialize the text field with the counter
   }
 
   @override
   void dispose() {
-    _controller.dispose(); // Dispose of the controller when the widget is disposed
+    _controller
+        .dispose(); // Dispose of the controller when the widget is disposed
     super.dispose();
   }
 
