@@ -5,6 +5,7 @@ import 'package:workout_tracker/workout_provider.dart';
 import 'package:workout_tracker/model/workout.dart';
 import 'package:workout_tracker/workout_recording_page.dart';
 
+import 'WorkoutTypeSelectionPage.dart';
 import 'join_team_workout_page.dart';
 import 'model/exercise.dart';
 
@@ -83,7 +84,8 @@ class WorkoutHistoryPage extends StatelessWidget {
           FloatingActionButton(
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => WorkoutRecordingPage()),
+                MaterialPageRoute(
+                    builder: (context) => WorkoutTypeSelectionPage()),
               );
             },
             child: const Icon(Icons.add),
