@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../workout_provider.dart';
 import '../model/workout_plan.dart';
 import '../firestore_service.dart';
+import 'join_team_workout_page.dart';
 
 class CreateGroupWorkoutPage extends StatefulWidget {
   @override
@@ -23,7 +24,7 @@ class _CreateGroupWorkoutPageState extends State<CreateGroupWorkoutPage> {
     // Fetch local exercises
     await selectedWorkoutPlan!.exercises.load();
 
-    // Save workout to Firestore
+    // Save workout to Firestore and get invite code
     String inviteCode = await _firestoreService.createGroupWorkout(
       selectedWorkoutPlan!.name,
       selectedType,
@@ -32,18 +33,10 @@ class _CreateGroupWorkoutPageState extends State<CreateGroupWorkoutPage> {
 
     setState(() => _loading = false);
 
-    // Show invite code
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Workout Created"),
-        content: Text("Share this invite code: $inviteCode"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("OK"),
-          ),
-        ],
+    // Navigate to Join Page with the invite code
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => JoinTeamWorkoutPage(inviteCode: inviteCode),
       ),
     );
   }

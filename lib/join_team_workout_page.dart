@@ -4,6 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../group_workout_recording_page.dart';
 
 class JoinTeamWorkoutPage extends StatefulWidget {
+
+  final String? inviteCode;
+
+  const JoinTeamWorkoutPage({this.inviteCode}) : super();
   @override
   _JoinTeamWorkoutPageState createState() => _JoinTeamWorkoutPageState();
 }
@@ -12,6 +16,14 @@ class _JoinTeamWorkoutPageState extends State<JoinTeamWorkoutPage> {
   final TextEditingController _codeController = TextEditingController();
   String? _errorMessage;
   bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.inviteCode != null) {
+      _codeController.text = widget.inviteCode!;
+    }
+  }
 
   Future<void> _joinWorkout() async {
     String inviteCode = _codeController.text.trim();
