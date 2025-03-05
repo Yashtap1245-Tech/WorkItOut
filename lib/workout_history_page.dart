@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:workout_tracker/team_workout_details.dart';
 import '../model/workout.dart';
 import '../workout_provider.dart';
 import 'model/exercise.dart';
@@ -187,7 +188,10 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => Placeholder(),
+              builder: (context) => TeamWorkoutDetails(
+                workoutId: workout["id"],
+                workoutType: workout["type"],
+              ),
             ),
           );
         },
