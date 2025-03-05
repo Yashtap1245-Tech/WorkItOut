@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:workout_tracker/qr_scanner_page.dart';
 import '../group_workout_recording_page.dart';
 
 class JoinTeamWorkoutPage extends StatefulWidget {
-
   final String? inviteCode;
 
-  const JoinTeamWorkoutPage({this.inviteCode}) : super();
+  const JoinTeamWorkoutPage({this.inviteCode});
+
   @override
   _JoinTeamWorkoutPageState createState() => _JoinTeamWorkoutPageState();
 }
@@ -66,6 +67,23 @@ class _JoinTeamWorkoutPageState extends State<JoinTeamWorkoutPage> {
     );
   }
 
+  void _scanQRCode() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => QRScannerPage(
+          onScanned: (String scannedCode) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                    JoinTeamWorkoutPage(inviteCode: scannedCode),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,11 +100,21 @@ class _JoinTeamWorkoutPageState extends State<JoinTeamWorkoutPage> {
               ),
             ),
             SizedBox(height: 20),
-            _loading
-                ? CircularProgressIndicator()
-                : ElevatedButton(
-              onPressed: _joinWorkout,
-              child: Text("Join Workout"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _scanQRCode,
+                  icon: Icon(Icons.qr_code_scanner),
+                  label: Text("Scan QR"),
+                ),
+                _loading
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: _joinWorkout,
+                        child: Text("Join Workout"),
+                      ),
+              ],
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class GroupWorkoutRecordingPage extends StatefulWidget {
   final String workoutId;
@@ -135,7 +136,6 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
     );
   }
 
-  // Invite code card (Visible only to the host)
   Widget _buildInviteCodeCard() {
     return Card(
       color: Colors.black,
@@ -144,6 +144,7 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               "Invite Code",
@@ -156,8 +157,19 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 8),
+            SizedBox(
+              height: 200,
+              width: 200,
+              child: QrImageView(
+                data: inviteCode,
+                version: QrVersions.auto,
+                size: 200.0,
+                backgroundColor: Colors.white,
+              ),
+            ),
+            SizedBox(height: 8),
             Text(
-              "Share this code with others to join the workout.",
+              "Share this code or QR code with others to join the workout.",
               style: TextStyle(fontSize: 14, color: Colors.white70),
               textAlign: TextAlign.center,
             ),
