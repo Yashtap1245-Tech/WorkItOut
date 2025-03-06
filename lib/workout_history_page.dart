@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:workout_tracker/performance.dart';
 import 'package:workout_tracker/team_workout_details.dart';
 import '../model/workout.dart';
 import '../workout_provider.dart';
@@ -47,26 +48,29 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
       ),
       body: _loading
           ? Center(child: CircularProgressIndicator())
-          : Consumer<WorkoutProvider>(
-              builder: (context, workoutProvider, child) {
-                final soloWorkouts = workoutProvider.workouts;
-                return RefreshIndicator(
-                  onRefresh: _refreshSoloWorkouts,
-                  child: ListView(
-                    children: [
-                      _buildSectionTitle("Solo Workouts"),
-                      if (soloWorkouts.isEmpty)
-                        Center(child: Text("No solo workouts found")),
-                      ...soloWorkouts
-                          .map((workout) => _buildSoloWorkoutCard(workout)),
-                      SizedBox(height: 20),
-                      _buildSectionTitle("Group Workouts"),
-                      _buildGroupWorkoutStream(),
-                    ],
-                  ),
-                );
-              },
-            ),
+          : Stack(children: [
+              Consumer<WorkoutProvider>(
+                builder: (context, workoutProvider, child) {
+                  final soloWorkouts = workoutProvider.workouts;
+                  return RefreshIndicator(
+                    onRefresh: _refreshSoloWorkouts,
+                    child: ListView(
+                      children: [
+                        _buildSectionTitle("Solo Workouts"),
+                        if (soloWorkouts.isEmpty)
+                          Center(child: Text("No solo workouts found")),
+                        ...soloWorkouts
+                            .map((workout) => _buildSoloWorkoutCard(workout)),
+                        SizedBox(height: 20),
+                        _buildSectionTitle("Group Workouts"),
+                        _buildGroupWorkoutStream(),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              Performance(),
+            ]),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -146,7 +150,8 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
     String currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection("group_workouts").snapshots(),
+      stream:
+          FirebaseFirestore.instance.collection("group_workouts").snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -156,24 +161,27 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
           return Center(child: Text("No group workouts found"));
         }
 
-        List<Map<String, dynamic>> groupWorkouts = snapshot.data!.docs.map((doc) {
-          var data = doc.data() as Map<String, dynamic>;
+        List<Map<String, dynamic>> groupWorkouts = snapshot.data!.docs
+            .map((doc) {
+              var data = doc.data() as Map<String, dynamic>;
 
-          List<dynamic> participants = data["participants"] is List
-              ? List<String>.from(data["participants"])
-              : [];
-          String createdBy = data["createdBy"] ?? "";
+              List<dynamic> participants = data["participants"] is List
+                  ? List<String>.from(data["participants"])
+                  : [];
+              String createdBy = data["createdBy"] ?? "";
 
-          if (participants.contains(currentUserId) || createdBy == currentUserId) {
-            return {
-              "id": doc.id,
-              "name": data["workoutName"],
-              "type": data["type"],
-              "participants": participants.length,
-            };
-          }
-          return null;
-        }).where((workout) => workout != null)
+              if (participants.contains(currentUserId) ||
+                  createdBy == currentUserId) {
+                return {
+                  "id": doc.id,
+                  "name": data["workoutName"],
+                  "type": data["type"],
+                  "participants": participants.length,
+                };
+              }
+              return null;
+            })
+            .where((workout) => workout != null)
             .cast<Map<String, dynamic>>()
             .toList();
 
@@ -182,12 +190,13 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
         }
 
         return Column(
-          children: groupWorkouts.map((workout) => _buildGroupWorkoutCard(workout)).toList(),
+          children: groupWorkouts
+              .map((workout) => _buildGroupWorkoutCard(workout))
+              .toList(),
         );
       },
     );
   }
-
 
   Widget _buildGroupWorkoutCard(Map<String, dynamic> workout) {
     return Card(

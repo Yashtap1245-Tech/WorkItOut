@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/performance.dart';
 import 'package:workout_tracker/workout_recording_page.dart';
 import 'create_group_workout_page.dart';
 
@@ -22,14 +23,16 @@ class WorkoutTypeSelectionPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Select Workout Type")),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildWorkoutTypeCard(context, "Solo", Icons.person),
-            _buildWorkoutTypeCard(context, "Collective", Icons.group)
-          ],
-        ),
-      ),
+          padding: const EdgeInsets.all(16.0),
+          child: Stack(children: [
+            Column(
+              children: [
+                _buildWorkoutTypeCard(context, "Solo", Icons.person),
+                _buildWorkoutTypeCard(context, "Collective", Icons.group)
+              ],
+            ),
+            Performance()
+          ])),
     );
   }
 

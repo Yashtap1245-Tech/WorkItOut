@@ -106,6 +106,16 @@ class _State extends State<WorkoutRecordingPage> {
   }
 
   Future<void> _saveWorkout() async {
+    if (selectedWorkoutPlan == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select a workout plan before saving."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       final workoutProvider = context.read<WorkoutProvider>();
       final db = await workoutProvider.getDatabase();
