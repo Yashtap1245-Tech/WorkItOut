@@ -79,7 +79,11 @@ class _CreateGroupWorkoutPageState extends State<CreateGroupWorkoutPage> {
               onPressed: _loading ? null : _createWorkout,
               child: _loading
                   ? CircularProgressIndicator()
-                  : Text("Create Workout"),
+                  : Text("Create Workout", style: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+              ),
             ),
           ],
         ),

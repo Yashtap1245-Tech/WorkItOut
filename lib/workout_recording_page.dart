@@ -162,7 +162,6 @@ class _State extends State<WorkoutRecordingPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Record Workout'),
-        backgroundColor: Colors.black12,
       ),
       body: _loading
           ? Center(child: CircularProgressIndicator())

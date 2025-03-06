@@ -130,6 +130,7 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _submitWorkoutResults,
         child: Icon(Icons.save, color: Colors.white),
+        backgroundColor: Colors.black,
       ),
     );
   }

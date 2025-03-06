@@ -105,12 +105,23 @@ class _JoinTeamWorkoutPageState extends State<JoinTeamWorkoutPage> {
               children: [
                 ElevatedButton.icon(
                   onPressed: _scanQRCode,
-                  icon: Icon(Icons.qr_code_scanner),
-                  label: Text("Scan QR"),
+                  icon: Icon(Icons.qr_code_scanner, color: Colors.white),
+                  label: Text(
+                    "Scan QR",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
                 _loading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.black,
+                  ),
                         onPressed: _joinWorkout,
                         child: Text("Join Workout"),
                       ),

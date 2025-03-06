@@ -111,7 +111,11 @@ class _AddWorkoutPlanPageState extends State<AddWorkoutPlanPage> {
                   onPressed: _loading ? null : _downloadWorkoutPlan,
                   child: _loading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Download'),
+                      : const Text('Download', style: TextStyle(color: Colors.white),),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
                 if (_message != null) ...[
                   const SizedBox(height: 16),

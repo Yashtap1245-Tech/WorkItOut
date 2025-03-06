@@ -6,7 +6,7 @@ import '../model/workout.dart';
 import '../workout_provider.dart';
 import 'model/exercise.dart';
 import 'workout_details.dart';
-import 'WorkoutTypeSelectionPage.dart';
+import 'workout_type_selection_page.dart';
 import 'join_team_workout_page.dart';
 
 class WorkoutHistoryPage extends StatefulWidget {
@@ -39,7 +39,8 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Workout History")),
+      appBar: AppBar(title: const Text("Workout History",
+          style: TextStyle(color: Colors.white)), backgroundColor: Colors.black,),
       body: _loading
           ? Center(child: CircularProgressIndicator())
           : Consumer<WorkoutProvider>(
@@ -71,9 +72,12 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
                 MaterialPageRoute(builder: (context) => JoinTeamWorkoutPage()),
               );
             },
-            label: Text("Join"),
-            icon: Icon(Icons.group),
-            backgroundColor: Colors.black12,
+            label: Text(
+              "Join",
+              style: TextStyle(color: Colors.white),
+            ),
+            icon: Icon(Icons.group, color: Colors.white),
+            backgroundColor: Colors.black,
           ),
           SizedBox(height: 10),
           FloatingActionButton(
@@ -83,8 +87,8 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
                     builder: (context) => WorkoutTypeSelectionPage()),
               );
             },
-            child: const Icon(Icons.add),
-            backgroundColor: Colors.black12,
+            child: const Icon(Icons.add, color: Colors.white),
+            backgroundColor: Colors.black,
           ),
         ],
       ),
