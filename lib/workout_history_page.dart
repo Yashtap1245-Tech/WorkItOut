@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -39,8 +40,11 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Workout History",
-          style: TextStyle(color: Colors.white)), backgroundColor: Colors.black,),
+      appBar: AppBar(
+        title: const Text("Workout History",
+            style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black,
+      ),
       body: _loading
           ? Center(child: CircularProgressIndicator())
           : Consumer<WorkoutProvider>(
@@ -139,10 +143,10 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
   }
 
   Widget _buildGroupWorkoutStream() {
+    String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection("group_workouts")
-          .snapshots(), // Listen for updates
+      stream: FirebaseFirestore.instance.collection("group_workouts").snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -152,25 +156,38 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
           return Center(child: Text("No group workouts found"));
         }
 
-        List<Map<String, dynamic>> groupWorkouts =
-            snapshot.data!.docs.map((doc) {
+        List<Map<String, dynamic>> groupWorkouts = snapshot.data!.docs.map((doc) {
           var data = doc.data() as Map<String, dynamic>;
-          return {
-            "id": doc.id,
-            "name": data["workoutName"],
-            "type": data["type"],
-            "participants": (data["participants"] as List).length,
-          };
-        }).toList();
+
+          List<dynamic> participants = data["participants"] is List
+              ? List<String>.from(data["participants"])
+              : [];
+          String createdBy = data["createdBy"] ?? "";
+
+          if (participants.contains(currentUserId) || createdBy == currentUserId) {
+            return {
+              "id": doc.id,
+              "name": data["workoutName"],
+              "type": data["type"],
+              "participants": participants.length,
+            };
+          }
+          return null;
+        }).where((workout) => workout != null)
+            .cast<Map<String, dynamic>>()
+            .toList();
+
+        if (groupWorkouts.isEmpty) {
+          return Center(child: Text("No group workouts available for you"));
+        }
 
         return Column(
-          children: groupWorkouts
-              .map((workout) => _buildGroupWorkoutCard(workout))
-              .toList(),
+          children: groupWorkouts.map((workout) => _buildGroupWorkoutCard(workout)).toList(),
         );
       },
     );
   }
+
 
   Widget _buildGroupWorkoutCard(Map<String, dynamic> workout) {
     return Card(
