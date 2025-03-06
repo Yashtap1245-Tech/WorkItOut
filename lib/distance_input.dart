@@ -14,7 +14,7 @@ class DistanceInput extends StatelessWidget {
       decoration: InputDecoration(
           labelText: "Distance Walked", hintText: "Enter Distance in meters"),
       inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly, // Only allow digits
+        FilteringTextInputFormatter.digitsOnly,
       ],
       validator: (value) {
         if (value == null || value.isEmpty) {

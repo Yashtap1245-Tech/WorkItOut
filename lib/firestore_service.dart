@@ -6,10 +6,10 @@ import '../model/exercise.dart';
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // Create a new group workout
-  Future<String> createGroupWorkout(String name, String type, List<Exercise> exercises) async {
+  Future<String> createGroupWorkout(
+      String name, String type, List<Exercise> exercises) async {
     String userId = FirebaseAuth.instance.currentUser!.uid;
-    String inviteCode = DateTime.now().millisecondsSinceEpoch.toString(); // Unique invite code
+    String inviteCode = DateTime.now().millisecondsSinceEpoch.toString();
 
     DocumentReference workoutRef = _db.collection("group_workouts").doc();
 
@@ -32,10 +32,11 @@ class FirestoreService {
     return inviteCode;
   }
 
-  // Join a group workout
   Future<bool> joinGroupWorkout(String inviteCode) async {
-    QuerySnapshot snapshot = await _db.collection("group_workouts")
-        .where("inviteCode", isEqualTo: inviteCode).get();
+    QuerySnapshot snapshot = await _db
+        .collection("group_workouts")
+        .where("inviteCode", isEqualTo: inviteCode)
+        .get();
 
     if (snapshot.docs.isEmpty) return false;
 
@@ -49,20 +50,23 @@ class FirestoreService {
     return true;
   }
 
-  // Submit workout results
-  Future<void> submitWorkoutResult(String workoutId, String exerciseId, double output) async {
+  Future<void> submitWorkoutResult(
+      String workoutId, String exerciseId, double output) async {
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    await _db.collection("group_workouts").doc(workoutId)
-        .collection("exercises").doc(exerciseId)
-        .collection("results").doc(userId)
+    await _db
+        .collection("group_workouts")
+        .doc(workoutId)
+        .collection("exercises")
+        .doc(exerciseId)
+        .collection("results")
+        .doc(userId)
         .set({
       "output": output,
       "timestamp": FieldValue.serverTimestamp(),
     });
   }
 
-  // Fetch workout data
   Stream<DocumentSnapshot> getGroupWorkout(String workoutId) {
     return _db.collection("group_workouts").doc(workoutId).snapshots();
   }

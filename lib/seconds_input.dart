@@ -24,18 +24,15 @@ class _SecondsInputState extends State<SecondsInput> {
   void initState() {
     super.initState();
     _controller = widget.controller;
-    _controller.text =
-        widget.counter.toString(); // Initialize the text field with the counter
+    _controller.text = widget.counter.toString();
   }
 
   @override
   void dispose() {
-    _controller
-        .dispose(); // Dispose of the controller when the widget is disposed
+    _controller.dispose();
     super.dispose();
   }
 
-  // When user types in the field, update the counter value.
   void _onTextChanged(String value) {
     if (value.isNotEmpty) {
       final parsedValue = int.tryParse(value);
@@ -44,7 +41,7 @@ class _SecondsInputState extends State<SecondsInput> {
           widget.controller.text = parsedValue.toString();
         });
       } else {
-        widget.controller.text = '0'; // Reset to 0 if input is invalid
+        widget.controller.text = '0';
       }
     }
   }
@@ -61,18 +58,18 @@ class _SecondsInputState extends State<SecondsInput> {
             labelText: 'Seconds Completed',
             hintText: 'Seconds: ${widget.counter}',
           ),
-          onChanged: _onTextChanged, // Detect change when typing
+          onChanged: _onTextChanged,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
               icon: Icon(Icons.remove),
-              onPressed: widget.onDecrement, // Decrease the seconds counter
+              onPressed: widget.onDecrement,
             ),
             IconButton(
               icon: Icon(Icons.add),
-              onPressed: widget.onIncrement, // Increase the seconds counter
+              onPressed: widget.onIncrement,
             ),
           ],
         ),

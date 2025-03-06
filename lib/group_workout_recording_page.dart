@@ -16,7 +16,7 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
   final Map<String, TextEditingController> _controllers = {};
   bool _loading = true;
   bool isHost = false;
-  String workoutType = "collaborative"; // Default type
+  String workoutType = "collaborative";
   String inviteCode = "";
   List<Map<String, dynamic>> exercises = [];
 
@@ -29,7 +29,6 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
   Future<void> _loadWorkoutDetails() async {
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    // Fetch workout details
     DocumentSnapshot workoutSnapshot = await FirebaseFirestore.instance
         .collection("group_workouts")
         .doc(widget.workoutId)
@@ -39,10 +38,9 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
       var data = workoutSnapshot.data() as Map<String, dynamic>;
       workoutType = data["type"];
       inviteCode = data["inviteCode"];
-      isHost = data["createdBy"] == userId; // Check if the user is the host
+      isHost = data["createdBy"] == userId;
     }
 
-    // Fetch exercises for this workout
     QuerySnapshot exerciseSnapshot = await FirebaseFirestore.instance
         .collection("group_workouts")
         .doc(widget.workoutId)
@@ -105,7 +103,7 @@ class _GroupWorkoutRecordingPageState extends State<GroupWorkoutRecordingPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            if (isHost) _buildInviteCodeCard(), // Show only if user is the host
+            if (isHost) _buildInviteCodeCard(),
             SizedBox(height: 16),
             ...exercises.map((exercise) {
               return Column(

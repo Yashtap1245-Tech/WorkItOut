@@ -36,7 +36,6 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
     setState(() => _loading = false);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,26 +43,25 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
       body: _loading
           ? Center(child: CircularProgressIndicator())
           : Consumer<WorkoutProvider>(
-        builder: (context, workoutProvider, child) {
-          final soloWorkouts = workoutProvider.workouts;
-          return RefreshIndicator(
-            onRefresh: _refreshSoloWorkouts,
-            child: ListView(
-              children: [
-                _buildSectionTitle("Solo Workouts"),
-                if (soloWorkouts.isEmpty)
-                  Center(child: Text("No solo workouts found")),
-                ...soloWorkouts
-                    .map((workout) => _buildSoloWorkoutCard(workout)),
-
-                SizedBox(height: 20),
-                _buildSectionTitle("Group Workouts"),
-                _buildGroupWorkoutStream(),
-              ],
+              builder: (context, workoutProvider, child) {
+                final soloWorkouts = workoutProvider.workouts;
+                return RefreshIndicator(
+                  onRefresh: _refreshSoloWorkouts,
+                  child: ListView(
+                    children: [
+                      _buildSectionTitle("Solo Workouts"),
+                      if (soloWorkouts.isEmpty)
+                        Center(child: Text("No solo workouts found")),
+                      ...soloWorkouts
+                          .map((workout) => _buildSoloWorkoutCard(workout)),
+                      SizedBox(height: 20),
+                      _buildSectionTitle("Group Workouts"),
+                      _buildGroupWorkoutStream(),
+                    ],
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -104,15 +102,12 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
     );
   }
 
-  // Solo workout card
-  // Solo workout card with successful exercise count
   Widget _buildSoloWorkoutCard(Workout workout) {
     final workoutProvider = context.read<WorkoutProvider>();
 
-    // Count successful exercises
     int successfulCount = workout.results.where((result) {
       final exercise = workoutProvider.exercises.firstWhere(
-            (e) => e.id == result.exerciseId,
+        (e) => e.id == result.exerciseId,
         orElse: () => Exercise(name: "Unknown", target: 0, unit: ""),
       );
       return exercise.name != "Unknown" && result.output >= exercise.target;
@@ -123,7 +118,8 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
       color: Colors.black12,
       child: ListTile(
         contentPadding: EdgeInsets.all(16),
-        title: Text("Solo Workout on ${workout.date.month}/${workout.date.day}"),
+        title:
+            Text("Solo Workout on ${workout.date.month}/${workout.date.day}"),
         subtitle: Text(
             "${workout.results.length} exercises, $successfulCount successful"),
         trailing: Icon(Icons.arrow_forward),
@@ -138,8 +134,6 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
     );
   }
 
-
-  // Real-time Firestore Stream for Group Workouts
   Widget _buildGroupWorkoutStream() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -174,7 +168,6 @@ class _WorkoutHistoryPageState extends State<WorkoutHistoryPage> {
     );
   }
 
-  // Group workout card
   Widget _buildGroupWorkoutCard(Map<String, dynamic> workout) {
     return Card(
       margin: EdgeInsets.all(8),

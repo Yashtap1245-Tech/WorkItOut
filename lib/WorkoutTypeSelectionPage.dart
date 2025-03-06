@@ -33,7 +33,8 @@ class WorkoutTypeSelectionPage extends StatelessWidget {
     );
   }
 
-  Widget _buildWorkoutTypeCard(BuildContext context, String type, IconData icon) {
+  Widget _buildWorkoutTypeCard(
+      BuildContext context, String type, IconData icon) {
     return Card(
       color: Colors.black,
       margin: const EdgeInsets.symmetric(vertical: 10),

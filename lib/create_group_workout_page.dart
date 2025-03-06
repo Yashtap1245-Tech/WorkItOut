@@ -21,10 +21,8 @@ class _CreateGroupWorkoutPageState extends State<CreateGroupWorkoutPage> {
 
     setState(() => _loading = true);
 
-    // Fetch local exercises
     await selectedWorkoutPlan!.exercises.load();
 
-    // Save workout to Firestore and get invite code
     String inviteCode = await _firestoreService.createGroupWorkout(
       selectedWorkoutPlan!.name,
       selectedType,
@@ -33,7 +31,6 @@ class _CreateGroupWorkoutPageState extends State<CreateGroupWorkoutPage> {
 
     setState(() => _loading = false);
 
-    // Navigate to Join Page with the invite code
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => JoinTeamWorkoutPage(inviteCode: inviteCode),
@@ -80,7 +77,9 @@ class _CreateGroupWorkoutPageState extends State<CreateGroupWorkoutPage> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loading ? null : _createWorkout,
-              child: _loading ? CircularProgressIndicator() : Text("Create Workout"),
+              child: _loading
+                  ? CircularProgressIndicator()
+                  : Text("Create Workout"),
             ),
           ],
         ),
